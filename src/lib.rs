@@ -1,5 +1,30 @@
 use std::ops::{Index, IndexMut};
 
+pub fn is_in_range<'i>(bit_size: usize, source: impl IntoIterator<Item = &'i u8>, source_len: usize) -> bool {
+    assert!(
+        bit_size <= source_len * 8,
+        "bit_size large than source bit size"
+    );
+
+    let empty_bit = source_len * 8 - bit_size;
+    let empty_byte = empty_bit / 8;
+    let empty_in_last = empty_bit % 8;
+    
+    for (index, byte) in source.into_iter().enumerate() {
+        if index < empty_byte && *byte != 0 {
+            return false;
+        }
+        if index == empty_byte {
+            if (byte & 0b11111111 << (8 - empty_in_last) ) != 0 {
+                return false;
+            }
+            return true;
+        }
+        
+    }   
+    unreachable!()
+}
+
 /// Writes N bits from source to target by bit offset
 ///
 /// **PANIC**: If requested bit_size large than source bit size
@@ -107,5 +132,13 @@ mod tests {
         let b_source = source.to_be_bytes();
         bit_write(&mut target, 4, 11, &b_source, b_source.len());
         assert_eq!(target, [0b00001111, 0b11111110]);
+    }
+
+    #[test]
+    fn is_not_in_range() {
+        let source = 0b00011111u8;
+        let b_source = source.to_be_bytes();
+        assert!(!is_in_range(4, &b_source, b_source.len()));
+        assert!(is_in_range(5, &b_source, b_source.len()));
     }
 }
