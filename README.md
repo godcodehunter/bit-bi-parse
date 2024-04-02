@@ -3,7 +3,7 @@ Very simple library for binary serialization/deserialization.
 Example simple serialization:
 
 ```rust
-    struct Sample {
+	struct Sample {
 		field1: u64,
 		field2: u64,
 		field3: u64,
