@@ -1,23 +1,34 @@
-use std::ops::IndexMut;
+use std::ops::{Index, IndexMut};
 
 /// Writes N bits from source to target by bit offset
 ///
+/// **PANIC**: If requested bit_size large than source bit size
+///
 /// **NOTE**: For the source, it does not check if the value exceeds the possible range,
 /// that is, the most significant bits are simply discarded
-pub fn bit_write<'c, C>(target: &mut C, bit_offset: &mut usize, bit_size: usize, source: u64)
-where
-    C: IndexMut<usize, Output = u8>,
+pub fn bit_write<'c, T, S>(
+    target: &mut T,
+    bit_offset: usize,
+    bit_size: usize,
+    source: &S,
+    source_len: usize,
+) where
+    T: IndexMut<usize, Output = u8>,
+    S: Index<usize, Output = u8>,
 {
     if bit_size == 0 {
         return;
     }
 
-    let _data = source.to_be_bytes();
+    assert!(
+        bit_size <= source_len * 8,
+        "bit_size large than source bit size"
+    );
 
-    let start_byte_index = *bit_offset / 8;
+    let start_byte_index = bit_offset / 8;
 
-    let available_at_first_byte = if *bit_offset % 8 > 0 {
-        8 - *bit_offset % 8
+    let available_at_first_byte = if bit_offset % 8 > 0 {
+        8 - bit_offset % 8
     } else {
         0
     };
@@ -38,11 +49,11 @@ where
     if bit_size % 8 > 0 {
         meaningful_len += 1;
     }
-    let mut fullness = *bit_offset % 8;
+    let mut fullness = bit_offset % 8;
     let mut cursor = bit_size;
     for i in 0..record_length {
         loop {
-            let mut index = 8 - meaningful_len;
+            let mut index = source_len - meaningful_len;
             let already_written = bit_size - cursor;
             if already_written >= bit_size % 8 && already_written > 0 {
                 index += 1;
@@ -64,13 +75,13 @@ where
                 }
 
                 let shift = slots - available;
-                target[start_byte_index + i] |= _data[index] << shift;
+                target[start_byte_index + i] |= source[index] << shift;
             } else {
                 write_size = slots;
                 fullness = 0;
 
                 let shift = available - write_size;
-                target[start_byte_index + i] |= _data[index] >> shift;
+                target[start_byte_index + i] |= source[index] >> shift;
             }
             cursor -= write_size;
 
@@ -79,7 +90,6 @@ where
             }
         }
     }
-    *bit_offset += bit_size
 }
 
 #[cfg(test)]
@@ -89,13 +99,13 @@ mod tests {
     #[test]
     fn it_works() {
         let mut target = [0u8; 2];
-        let mut offset = 4;
         let source = u64::from_be_bytes([
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000111,
             0b11111111,
         ]);
 
-        bit_write(&mut target, &mut offset, 11, source);
+        let b_source = source.to_be_bytes();
+        bit_write(&mut target, 4, 11, &b_source, b_source.len());
         assert_eq!(target, [0b00001111, 0b11111110]);
     }
 }
