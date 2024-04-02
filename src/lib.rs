@@ -4,7 +4,7 @@ use std::ops::IndexMut;
 /// 
 /// **NOTE**: For the source, it does not check if the value exceeds the possible range, 
 /// that is, the most significant bits are simply discarded
-fn bit_write<'c, C>(target: &mut C, bit_offset: &mut usize, bit_size: usize, source: u64) 
+pub fn bit_write<'c, C>(target: &mut C, bit_offset: &mut usize, bit_size: usize, source: u64) 
 where C: IndexMut<usize, Output =u8> {
 	if bit_size == 0 {
 		return
