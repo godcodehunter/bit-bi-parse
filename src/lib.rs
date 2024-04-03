@@ -15,12 +15,8 @@ pub fn is_in_range<'i>(bit_size: usize, source: impl IntoIterator<Item = &'i u8>
             return false;
         }
         if index == empty_byte {
-            if (byte & 0b11111111 << (8 - empty_in_last) ) != 0 {
-                return false;
-            }
-            return true;
+            return (byte & 0b11111111 << (8 - empty_in_last) ) == 0 
         }
-        
     }   
     unreachable!()
 }
@@ -51,22 +47,14 @@ pub fn bit_write<'c, T, S>(
     );
 
     let start_byte_index = bit_offset / 8;
+    let slots_at_start_byte = 8 - bit_offset % 8;
 
-    let available_at_first_byte = if bit_offset % 8 > 0 {
-        8 - bit_offset % 8
-    } else {
-        0
-    };
+    let mut affected_bytes = 1;
+    if bit_size.saturating_sub(slots_at_start_byte) != 0 {
+        affected_bytes += (bit_size - slots_at_start_byte) / 8;
 
-    let mut record_length = 0;
-    if available_at_first_byte > 0 {
-        record_length += 1;
-    }
-    if bit_size - available_at_first_byte > 0 {
-        record_length += (bit_size - available_at_first_byte) / 8;
-
-        if (bit_size - available_at_first_byte) % 8 > 0 {
-            record_length += 1;
+        if (bit_size - slots_at_start_byte) % 8 > 0 {
+            affected_bytes += 1;
         }
     }
 
@@ -76,7 +64,7 @@ pub fn bit_write<'c, T, S>(
     }
     let mut fullness = bit_offset % 8;
     let mut cursor = bit_size;
-    for i in 0..record_length {
+    for i in 0..affected_bytes {
         loop {
             let mut index = source_len - meaningful_len;
             let already_written = bit_size - cursor;
@@ -87,30 +75,30 @@ pub fn bit_write<'c, T, S>(
                 }
             }
 
+            let slots = if fullness != 0 { 8 - fullness } else { 8 };
             let available = if cursor % 8 != 0 { cursor % 8 } else { 8 };
 
             let write_size;
-            let slots = if fullness != 0 { 8 - fullness } else { 8 };
-
             if slots >= available {
                 write_size = available;
                 fullness += available;
-                if fullness == 8 {
-                    fullness = 0;
-                }
-
+                
                 let shift = slots - available;
                 target[start_byte_index + i] |= source[index] << shift;
             } else {
                 write_size = slots;
-                fullness = 0;
+                fullness = 8;
 
                 let shift = available - write_size;
                 target[start_byte_index + i] |= source[index] >> shift;
             }
             cursor -= write_size;
 
-            if fullness == 0 || cursor == 0 {
+            if cursor == 0 {
+                return;
+            }
+            if fullness == 8 {
+                fullness = 0;
                 break;
             }
         }
