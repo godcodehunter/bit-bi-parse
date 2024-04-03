@@ -27,7 +27,7 @@ pub fn is_in_range<'i>(bit_size: usize, source: impl IntoIterator<Item = &'i u8>
 ///
 /// **NOTE**: For the source, it does not check if the value exceeds the possible range,
 /// that is, the most significant bits are simply discarded
-pub fn bit_write<'c, T, S>(
+pub fn bit_write<T, S>(
     target: &mut T,
     bit_offset: usize,
     bit_size: usize,
@@ -79,18 +79,20 @@ pub fn bit_write<'c, T, S>(
             let available = if cursor % 8 != 0 { cursor % 8 } else { 8 };
 
             let write_size;
+            
+            let mask = !0b11111111u8.checked_shl(available as u32).unwrap_or_default();
             if slots >= available {
                 write_size = available;
                 fullness += available;
                 
                 let shift = slots - available;
-                target[start_byte_index + i] |= source[index] << shift;
+                target[start_byte_index + i] |= (mask & source[index]) << shift;
             } else {
                 write_size = slots;
                 fullness = 8;
 
-                let shift = available - write_size;
-                target[start_byte_index + i] |= source[index] >> shift;
+                let shift = available - slots;
+                target[start_byte_index + i] |= (mask & source[index]) >> shift;
             }
             cursor -= write_size;
 
@@ -128,5 +130,10 @@ mod tests {
         let b_source = source.to_be_bytes();
         assert!(!is_in_range(4, &b_source, b_source.len()));
         assert!(is_in_range(5, &b_source, b_source.len()));
+    }
+
+    #[test]
+    fn test() {
+        println!("{:#010b}", !0b11111111u8.checked_shl(8 as u32).unwrap_or_default());
     }
 }
