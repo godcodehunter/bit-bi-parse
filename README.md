@@ -18,7 +18,7 @@ Example simple serialization:
 
 		fn try_into(self) -> Result<[u8; 14], Self::Error> {
 			/*
-				CONVERT values ​​to bytes for passing to the 
+				CONVERT values to bytes for passing to the 
 				verification function
 			*/
 			let b_field1 = self.field1.to_be_bytes();
