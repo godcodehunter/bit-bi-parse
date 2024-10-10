@@ -132,9 +132,4 @@ mod tests {
         assert!(!is_in_range(4, &b_source, b_source.len()));
         assert!(is_in_range(5, &b_source, b_source.len()));
     }
-
-    #[test]
-    fn test() {
-        println!("{:#010b}", !0b11111111u8.checked_shl(8 as u32).unwrap_or_default());
-    }
 }
