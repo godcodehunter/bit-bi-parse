@@ -18,7 +18,8 @@ Example simple serialization:
 
 		fn try_into(self) -> Result<[u8; 14], Self::Error> {
 			/*
-				CONVERT values ​​to bytes for passing to the verification function
+				CONVERT values ​​to bytes for passing to the 
+				verification function
 			*/
 			let b_field1 = self.field1.to_be_bytes();
 			let b_field2 = self.field2.to_be_bytes();
@@ -30,7 +31,8 @@ Example simple serialization:
 			*/
 
 			/*
-				CHECK that stored values do not go beyond the storage (there are enough bits for encoding)
+				CHECK that stored values do not go beyond the storage 
+				(there are enough bits for encoding)
 			*/
 			let mut errors = vec![];
 			if !is_in_range(6, &b_field1, b_field1.len()) {
