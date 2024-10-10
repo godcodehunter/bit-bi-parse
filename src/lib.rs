@@ -50,10 +50,11 @@ pub fn bit_write<T, S>(
     let slots_at_start_byte = 8 - bit_offset % 8;
 
     let mut affected_bytes = 1;
-    if bit_size.saturating_sub(slots_at_start_byte) != 0 {
-        affected_bytes += (bit_size - slots_at_start_byte) / 8;
+    let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    if remainder != 0 {
+        affected_bytes += remainder / 8;
 
-        if (bit_size - slots_at_start_byte) % 8 > 0 {
+        if remainder % 8 > 0 {
             affected_bytes += 1;
         }
     }
