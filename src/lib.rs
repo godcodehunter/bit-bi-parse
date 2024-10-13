@@ -215,15 +215,5 @@ pub fn bit_read<T, S>(
 T: IndexMut<usize, Output = u8>,
 S: Index<usize, Output = u8>,
 {
-    if bit_size == 0 {
-        return;
-    }
-
-    assert!(
-        bit_size <= target_len * 8,
-        "bit_size large than target bit size"
-    );
-
-    let start_byte_index = bit_offset / 8;
-    
+    todo!()
 }
