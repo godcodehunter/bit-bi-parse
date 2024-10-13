@@ -56,7 +56,20 @@ pub fn is_in_range<'i>(
         
         // pb: meet the requirements of the mask
         if index == pf_byte_num {
-
+            // For example `empty_in_last` is 3, then
+            //
+            // 0b11111111 << (8 - 3)
+            // 0b11111111 << 5
+            // 0b11100000
+            // 
+            // E - examinee
+            // 0bEEEEEEEE 
+            // 0b11100000
+            // ----------
+            // 0bEEE00000
+            //   ---
+            //      \
+            //       and should be equal to 0
             return (byte & 0b11111111 << (8 - empty_in_last) ) == 0 
         }
     }   
