@@ -1,20 +1,62 @@
 use std::ops::{Index, IndexMut};
 
-pub fn is_in_range<'i>(bit_size: usize, source: impl IntoIterator<Item = &'i u8>, source_len: usize) -> bool {
+/// Checks that's current stored value, 
+/// does not exceed the `bit_size` range  
+pub fn is_in_range<'i>(
+    bit_size: usize, 
+    source: impl IntoIterator<Item = &'i u8>, 
+    source_len: usize,
+) -> bool {
+    if bit_size == 0 {
+        return true;
+    }
+
     assert!(
         bit_size <= source_len * 8,
         "bit_size large than source bit size"
     );
-
+    
+    // For example for byte. If `bit_size` is 5, then first 
+    // three bit's should be empty
+    //
+    // |0|0|0|1|0|1|1|1|
+    // ------ 
     let empty_bit = source_len * 8 - bit_size;
-    let empty_byte = empty_bit / 8;
+    
+    // Calculate the index of partial filled byte
+    let pf_byte_num = empty_bit / 8;
+    
+    // Calculate the number of empty bit in at 
+    // the beginning of last partial filled byte
+    //  |eb|eb|eb|eb|pb|fb|fb|fb|
+    //  ------------ -- --------
+    //  |            |  \
+    //  |            |   \- filled byte
+    //  |            \
+    //  |             \- partial filled
+    //  \               
+    //   full empty byte
+    // 
+    // NOTE: Content placed in to the second half 
+    // of the partially filled byte and then to the 
+    // filled byte
     let empty_in_last = empty_bit % 8;
     
+    // We iterate byte by byte and check the following condition:
+    // |eb|eb|eb|pb|fb|fb|
+    //
+    // eb: should be empty
+    // pb: meet the requirements of the mask
+    // fb: not checked
     for (index, byte) in source.into_iter().enumerate() {
-        if index < empty_byte && *byte != 0 {
+        // eb: should be empty
+        if index < pf_byte_num && *byte != 0 {
             return false;
         }
-        if index == empty_byte {
+        
+        // pb: meet the requirements of the mask
+        if index == pf_byte_num {
+
             return (byte & 0b11111111 << (8 - empty_in_last) ) == 0 
         }
     }   
@@ -132,4 +174,27 @@ mod tests {
         assert!(!is_in_range(4, &b_source, b_source.len()));
         assert!(is_in_range(5, &b_source, b_source.len()));
     }
+}
+
+pub fn bit_read<T, S>(
+    source: &T,
+    bit_offset: usize,
+    bit_size: usize,
+    target: &mut S,
+    target_len: usize,
+) where
+T: IndexMut<usize, Output = u8>,
+S: Index<usize, Output = u8>,
+{
+    if bit_size == 0 {
+        return;
+    }
+
+    assert!(
+        bit_size <= target_len * 8,
+        "bit_size large than target bit size"
+    );
+
+    let start_byte_index = bit_offset / 8;
+    
 }
