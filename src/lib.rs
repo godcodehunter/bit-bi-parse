@@ -1,5 +1,14 @@
 use std::ops::{Index, IndexMut};
 
+// Maximum value that N bits can store
+pub fn bits_to_max_hold(bit_size: u32) -> u32 {
+    let mut acc = 0;
+    for n in 0..bit_size {
+        acc += 2u32.pow(n);
+    }
+    acc
+}
+
 /// Checks that's current stored value, 
 /// does not exceed the `bit_size` range  
 pub fn is_in_range<'i>(
