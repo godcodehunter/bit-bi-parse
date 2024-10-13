@@ -1,6 +1,6 @@
 Very simple library for binary serialization/deserialization.
 
-// TODO: image
+![alt text](./principle.png)
 
 Example simple serialization:
 
