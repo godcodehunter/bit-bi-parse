@@ -1,8 +1,8 @@
-Very simple library for binary serialization/deserialization.
+Very simple library for binary printer/parser.
 
 ![alt text](./principle.png)
 
-Example simple serialization:
+Example simple printer:
 
 ```rust
 	struct Sample {
@@ -86,7 +86,7 @@ Example simple serialization:
 	}
 ```
 
-Example simple deserialization:
+Example simple parser:
 
 ```rust
 	//TODO
