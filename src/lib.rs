@@ -1,7 +1,14 @@
 use std::ops::{Index, IndexMut};
 
-// Maximum value that N bits can store
+/// Maximum value that N bits can store
 pub fn bits_to_max_hold(bit_size: u32) -> u32 {
+    // For example, `bit_size` is 6
+    // Then max number is 111111
+    // The translation of the value occurs 
+    // according to the formula 
+    // 2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^1
+    //
+    // Then, in general, from 0 to N:
     let mut acc = 0;
     for n in 0..bit_size {
         acc += 2u32.pow(n);
