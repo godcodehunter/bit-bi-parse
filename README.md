@@ -13,6 +13,26 @@ Example simple printer:
 		field5: u64,
 	}
 
+	#[derive(Debug)]
+	struct SamplePrinterError {
+		field_name: String,
+		value: u64,
+		max_value: u64,
+	}
+
+	impl fmt::Display for SamplePrinterError {
+		fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+			write!(
+				f,
+				"Error: field '{}' has value {}, which exceeds the maximum value {}.",
+				self.field_name, self.value, self.max_value
+			)
+		}
+	}
+
+	impl Error for SamplePrinterError {}
+
+
 	impl TryInto<[u8; 14]> for Sample {
 		type Error = Vec<&'static str>;
 
@@ -36,19 +56,39 @@ Example simple printer:
 			*/
 			let mut errors = vec![];
 			if !is_in_range(6, &b_field1, b_field1.len()) {
-				errors.push("field1");
+				errors.push(SamplePrinterError{
+					field_name: "field1".to_string(),
+					value: field1,
+					max_value: bits_to_max_hold(6) as u64,
+				});
 			}
 			if !is_in_range(32, &b_field2, b_field2.len()) {
-				errors.push("field2");
+				errors.push(SamplePrinterError{
+					field_name: "field2".to_string(),
+					value: field2,
+					max_value: bits_to_max_hold(32) as u64,
+				});
 			}
 			if !is_in_range(4, &b_field3, b_field3.len()) {
-				errors.push("field3");
+				errors.push(SamplePrinterError{
+					field_name: "field3".to_string(),
+					value: field3,
+					max_value: bits_to_max_hold(4) as u64,
+				});
 			}
 			if !is_in_range(64, &b_field4, b_field4.len()) {
-				errors.push("field4");
+				errors.push(SamplePrinterError{
+					field_name: "field4".to_string(),
+					value: field4,
+					max_value: bits_to_max_hold(64) as u64,
+				});
 			}
 			if !is_in_range(6, &b_field5, b_field5.len()) {
-				errors.push("field5");
+				errors.push(SamplePrinterError{
+					field_name: "field5".to_string(),
+					value: field5,
+					max_value: bits_to_max_hold(6) as u64,
+				});
 			}
 
 			if !errors.is_empty() {
@@ -88,9 +128,40 @@ Example simple printer:
 
 Example simple parser:
 
-```rust
-	//TODO
-```
+<!-- ```rust
+	struct Sample {
+		field1: u64,
+		field2: u64,
+		field3: u64,
+		field4: u64,
+		field5: u64,
+	}
+
+	impl TryFrom<[u8; 14]> for Sample {
+    	type Error = Vec<&'static str>;
+
+    	fn try_from(bytes: [u8; 14]) -> Result<Self, Self::Error> {
+			let mut target: Sample = Default::default();
+
+			bit_read(&bytes, offset, 6, &mut bytes, b_field1_len);
+        	offset += 6;
+
+			bit_read(&bytes, offset, 32, &mut target.field2, b_field2_len);
+        	offset += 32;
+
+			bit_read(&bytes, offset, 4, &mut target.field3, b_field3_len);
+        	offset += 4;
+
+			bit_read(&bytes, offset, 64, &mut target.field4, b_field4_len);
+        	offset += 64;
+
+			bit_read(&bytes, offset, 6, &mut target.field5, b_field5_len);
+
+			Ok(target)
+		}
+	}
+
+``` -->
 
 With use codegen macro:
 
