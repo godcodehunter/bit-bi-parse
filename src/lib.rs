@@ -222,17 +222,27 @@ pub fn bit_write<T, S>(
     // |b|b|pa|a|a|a|pa|b|b|
     //      ^  ^ ^ ^ ^
     //      --------->
-    for i in start_byte_index..(start_byte_index + affected_bytes_num) {
+    let iter_range = start_byte_index..(start_byte_index + affected_bytes_num);
+    for target_index in iter_range {
         loop {
-            let mut index = source_len - meaningful_len;
+
+            /*
+				CALCULATE 
+			*/
+
+            let mut source_index = source_len - meaningful_len;
             // Number of bits already written
             let already_written = bit_size - cursor;
             if already_written >= bit_size % 8 && already_written > 0 {
-                index += 1;
+                source_index += 1;
                 if already_written / 8 > 1 {
-                    index += already_written / 8 - 1
+                    source_index += already_written / 8 - 1
                 }
             }
+
+            /*
+				CALCULATE END
+			*/
 
             let slots = if fullness != 0 { 8 - fullness } else { 8 };
             let available = if cursor % 8 != 0 { cursor % 8 } else { 8 };
@@ -245,13 +255,13 @@ pub fn bit_write<T, S>(
                 fullness += available;
                 
                 let shift = slots - available;
-                target[i] |= (mask & source[index]) << shift;
+                target[target_index] |= (mask & source[source_index]) << shift;
             } else {
                 write_size = slots;
                 fullness = 8;
 
                 let shift = available - slots;
-                target[i] |= (mask & source[index]) >> shift;
+                target[target_index] |= (mask & source[source_index]) >> shift;
             }
 
             // Reduce by the amount of written
