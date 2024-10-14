@@ -252,6 +252,8 @@ pub fn bit_write<T, S>(
                 let shift = available - slots;
                 target[i] |= (mask & source[index]) >> shift;
             }
+
+            // Reduce by the amount of written
             cursor -= write_size;
 
             // We have written all the bits, we are finishing the procedure
