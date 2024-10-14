@@ -37,10 +37,10 @@ pub fn is_in_range<'i>(
     //
     // |0|0|0|1|0|1|1|1|
     // ------ 
-    let empty_bit = source_len * 8 - bit_size;
+    let ahead_empty_bit = source_len * 8 - bit_size;
     
     // Calculate the index of partial filled byte
-    let pf_byte_num = empty_bit / 8;
+    let pf_byte_index = ahead_empty_bit / 8;
     
     // Calculate the number of empty bit in at 
     // the beginning of last partial filled byte
@@ -56,7 +56,7 @@ pub fn is_in_range<'i>(
     // NOTE: Content placed in to the second half 
     // of the partially filled byte and then to the 
     // filled byte
-    let empty_in_last = empty_bit % 8;
+    let empty_in_start_of_pf = ahead_empty_bit % 8;
     
     // We iterate byte by byte and check the following condition:
     // |eb|eb|eb|pb|fb|fb|
@@ -66,12 +66,12 @@ pub fn is_in_range<'i>(
     // fb: not checked
     for (index, byte) in source.into_iter().enumerate() {
         // eb: should be empty
-        if index < pf_byte_num && *byte != 0 {
+        if index < pf_byte_index && *byte != 0 {
             return false;
         }
         
         // pb: meet the requirements of the mask
-        if index == pf_byte_num {
+        if index == pf_byte_index {
             // For example `empty_in_last` is 3, then
             //
             // 0b11111111 << (8 - 3)
@@ -86,7 +86,7 @@ pub fn is_in_range<'i>(
             //   ---
             //      \
             //       and should be equal to 0
-            return (byte & 0b11111111 << (8 - empty_in_last) ) == 0 
+            return (byte & 0b11111111 << (8 - empty_in_start_of_pf) ) == 0 
         }
     }   
     unreachable!()
