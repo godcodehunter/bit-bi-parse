@@ -164,7 +164,19 @@ pub fn bit_write<T, S>(
         "bit_size large than source bit size"
     );
 
+    
     let start_byte_index = bit_offset / 8;
+
+    // If we imagine that `bit_size`` is 13, then 
+    // there are 5 slots (bits in which we write)
+    //              |
+    //              |
+    //              ----------
+    //  ... # |1|0|1|1|0|0|1|1| # |1|0|1|1|0|0|1|1| # ...
+    //       \_________________/ \_________________/  
+    //               |                   \
+    //   first partially affected byte   next affected byte
+    //
     let slots_at_start_byte = 8 - bit_offset % 8;
 
     // The number of bytes to which the recording will be performed
