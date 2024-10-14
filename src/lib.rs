@@ -216,7 +216,12 @@ pub fn bit_write<T, S>(
     // A counter that counts the number of bits written.
     let mut cursor = bit_size;
     
-    for i in 0..affected_bytes_num {
+    // Iterate affected bytes
+    //
+    // |b|b|pa|a|a|a|pa|b|b|
+    //      ^  ^ ^ ^ ^
+    //      --------->
+    for i in start_byte_index..(start_byte_index + affected_bytes_num) {
         loop {
             let mut index = source_len - meaningful_len;
             let already_written = bit_size - cursor;
@@ -238,13 +243,13 @@ pub fn bit_write<T, S>(
                 fullness += available;
                 
                 let shift = slots - available;
-                target[start_byte_index + i] |= (mask & source[index]) << shift;
+                target[i] |= (mask & source[index]) << shift;
             } else {
                 write_size = slots;
                 fullness = 8;
 
                 let shift = available - slots;
-                target[start_byte_index + i] |= (mask & source[index]) >> shift;
+                target[i] |= (mask & source[index]) >> shift;
             }
             cursor -= write_size;
 
