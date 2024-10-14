@@ -168,7 +168,7 @@ pub fn bit_write<T, S>(
     // the recording will be performed
     let start_byte_index = bit_offset / 8;
 
-    // If we imagine that `bit_size`` is 13, then 
+    // If we imagine that `bit_offset` is 3, then 
     // there are 5 slots (bits in which we write)
     //              |
     //              |
@@ -188,13 +188,17 @@ pub fn bit_write<T, S>(
     // NOTE: Minimum 1, since `bit_size` > 0
     let mut affected_bytes_num = 1;
 
-    // Slot's at last partially affected byte
-    //
-    // NOTE: todo
+    // NOTE: we use here saturating subtraction, because
+    // we have a situation where there are enough 
+    // slots in the first partially affected byte for recording
     let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    
+    // Сheck the situation described in the note above 
     if remainder != 0 {
+        // Add affected byte
         affected_bytes_num += remainder / 8;
 
+        // If exist remainder, add last partially affected byte
         if remainder % 8 > 0 {
             affected_bytes_num += 1;
         }
