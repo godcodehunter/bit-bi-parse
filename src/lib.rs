@@ -43,7 +43,7 @@ pub fn is_in_range<'i>(
     let pf_byte_index = ahead_empty_bit / 8;
     
     // Calculate the number of empty bit in at 
-    // the beginning of last partial filled byte
+    // the beginning of partial filled byte
     //  |eb|eb|eb|eb|pb|fb|fb|fb|
     //  ------------ -- --------
     //  |            |  \
