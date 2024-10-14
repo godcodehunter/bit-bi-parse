@@ -164,7 +164,8 @@ pub fn bit_write<T, S>(
         "bit_size large than source bit size"
     );
 
-    
+    // The index of the first byte of bytes to which 
+    // the recording will be performed
     let start_byte_index = bit_offset / 8;
 
     // If we imagine that `bit_size`` is 13, then 
