@@ -97,6 +97,23 @@ pub fn is_in_range<'i>(
     unreachable!()
 }
 
+mod tests_is_in_range {
+    use super::*;
+    
+    #[test]
+    fn check_pf() {
+        let source = [0b00000000u8, 0b00011111u8];
+        assert!(!is_in_range(4, &source, source.len()));
+        assert!(is_in_range(5, &source, source.len()));
+    }
+
+    #[test]
+    fn check_eb() {
+        let source = [0b00001000u8, 0b00011111u8];
+        assert!(!is_in_range(5, &source, source.len()));
+    }
+}
+
 pub fn iter_bit_window() {
    todo!() 
 }
@@ -216,14 +233,6 @@ mod tests {
         let b_source = source.to_be_bytes();
         bit_write(&mut target, 4, 11, &b_source, b_source.len());
         assert_eq!(target, [0b00001111, 0b11111110]);
-    }
-
-    #[test]
-    fn is_not_in_range() {
-        let source = 0b00011111u8;
-        let b_source = source.to_be_bytes();
-        assert!(!is_in_range(4, &b_source, b_source.len()));
-        assert!(is_in_range(5, &b_source, b_source.len()));
     }
 }
 
