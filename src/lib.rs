@@ -187,6 +187,10 @@ pub fn bit_write<T, S>(
     //
     // NOTE: Minimum 1, since `bit_size` > 0
     let mut affected_bytes_num = 1;
+
+    // Slot's at last partially affected byte
+    //
+    // NOTE: todo
     let remainder = bit_size.saturating_sub(slots_at_start_byte);
     if remainder != 0 {
         affected_bytes_num += remainder / 8;
