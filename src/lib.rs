@@ -202,6 +202,15 @@ pub fn bit_write<T, S>(
     if bit_size % 8 > 0 {
         meaningful_len += 1;
     }
+
+    // Counter of the number of slots already occupied 
+    // in the current byte. Here we initialize for
+    // first partially affected byte
+    //
+    //        for ex 3 occupied slots, so `fullness` == 3
+    // ------/
+    // |1|1|1|0|0|0|0|0| 
+    //
     let mut fullness = bit_offset % 8;
     
     // A counter that counts the number of bits written.
@@ -243,7 +252,7 @@ pub fn bit_write<T, S>(
             if cursor == 0 {
                 return;
             }
-            
+
             if fullness == 8 {
                 fullness = 0;
                 break;
