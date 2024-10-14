@@ -144,7 +144,7 @@ pub fn bit_write<T, S>(
     bit_offset: usize,
     bit_size: usize,
     source: &S,
-    source_len: usize,
+    byte_source_len: usize,
 ) where
     T: IndexMut<usize, Output = u8>,
     S: Index<usize, Output = u8>,
@@ -154,7 +154,7 @@ pub fn bit_write<T, S>(
     }
 
     assert!(
-        bit_size <= source_len * 8,
+        bit_size <= byte_source_len * 8,
         "bit_size large than source bit size"
     );
 
@@ -225,14 +225,16 @@ pub fn bit_write<T, S>(
     let iter_range = start_byte_index..(start_byte_index + affected_bytes_num);
     for target_index in iter_range {
         loop {
-
-            /*
-				CALCULATE 
-			*/
-
-            let mut source_index = source_len - meaningful_len;
+       
+            // Calculate index of first byte being written
+            // NOTE: `source_len` can be bigger than `meaningful_len`, 
+            // so the most significant byte is simply discarded. 
+            let mut source_index = byte_source_len - meaningful_len;
+            
             // Number of bits already written
             let already_written = bit_size - cursor;
+
+            
             if already_written >= bit_size % 8 && already_written > 0 {
                 source_index += 1;
                 if already_written / 8 > 1 {
@@ -240,9 +242,7 @@ pub fn bit_write<T, S>(
                 }
             }
 
-            /*
-				CALCULATE END
-			*/
+          
 
             let slots = if fullness != 0 { 8 - fullness } else { 8 };
             let available = if cursor % 8 != 0 { cursor % 8 } else { 8 };
