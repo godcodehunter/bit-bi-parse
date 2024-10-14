@@ -193,7 +193,7 @@ pub fn bit_write<T, S>(
     // slots in the first partially affected byte for recording
     let remainder = bit_size.saturating_sub(slots_at_start_byte);
     
-    // Сheck the situation described in the note above 
+    // Check the situation described in the note above 
     if remainder != 0 {
         // Add affected byte
         affected_bytes_num += remainder / 8;
