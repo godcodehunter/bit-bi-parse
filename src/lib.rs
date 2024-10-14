@@ -6,7 +6,7 @@ pub fn bits_to_max_hold(bit_size: u32) -> u32 {
     // Then max number is 111111
     // The translation of the value occurs 
     // according to the formula 
-    // 2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^1
+    // 2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0
     //
     // Then, in general, from 0 to N:
     let mut acc = 0;
@@ -14,6 +14,11 @@ pub fn bits_to_max_hold(bit_size: u32) -> u32 {
         acc += 2u32.pow(n);
     }
     acc
+}
+
+#[test]
+fn check_bits_to_max_hold() {
+    assert_eq!(63, bits_to_max_hold(6));
 }
 
 /// Checks that's current stored value, 
@@ -92,12 +97,29 @@ pub fn is_in_range<'i>(
     unreachable!()
 }
 
+pub fn iter_bit_window() {
+   todo!() 
+}
+
+pub fn bit_clean<T>(
+    target: &mut T,
+    bit_offset: usize,
+    bit_size: usize,
+) where
+    T: IndexMut<usize, Output = u8>
+{
+    todo!()
+}
+
 /// Writes N bits from source to target by bit offset
-///
+/// 
 /// **PANIC**: If requested bit_size large than source bit size
 ///
 /// **NOTE**: For the source, it does not check if the value exceeds the possible range,
-/// that is, the most significant bits are simply discarded
+/// that is, the most significant bits, that out of `bit_size`, are simply discarded.
+/// 
+/// **NOTE**: It is assumed that the target is prepared for writing, i.e., 
+/// for example, no cleaning is applied
 pub fn bit_write<T, S>(
     target: &mut T,
     bit_offset: usize,
@@ -212,8 +234,8 @@ pub fn bit_read<T, S>(
     target: &mut S,
     target_len: usize,
 ) where
-T: IndexMut<usize, Output = u8>,
-S: Index<usize, Output = u8>,
+    T: IndexMut<usize, Output = u8>,
+    S: Index<usize, Output = u8>,
 {
     todo!()
 }
