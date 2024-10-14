@@ -198,6 +198,7 @@ pub fn bit_write<T, S>(
         }
     }
 
+    // We calculate the length of the written body in bytes (rounding up)
     let mut meaningful_len = bit_size / 8;
     if bit_size % 8 > 0 {
         meaningful_len += 1;
