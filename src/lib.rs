@@ -130,12 +130,6 @@ pub fn bit_clean<T>(
     todo!()
 }
 
-mod tests_bit_clean {
-    use super::*;
-
-
-}
-
 /// Writes N bits from source to target by bit offset
 /// 
 /// **PANIC**: If requested bit_size large than source bit size
@@ -209,7 +203,10 @@ pub fn bit_write<T, S>(
         meaningful_len += 1;
     }
     let mut fullness = bit_offset % 8;
+    
+    // A counter that counts the number of bits written.
     let mut cursor = bit_size;
+    
     for i in 0..affected_bytes_num {
         loop {
             let mut index = source_len - meaningful_len;
@@ -242,9 +239,11 @@ pub fn bit_write<T, S>(
             }
             cursor -= write_size;
 
+            // We have written all the bits, we are finishing the procedure
             if cursor == 0 {
                 return;
             }
+            
             if fullness == 8 {
                 fullness = 0;
                 break;
