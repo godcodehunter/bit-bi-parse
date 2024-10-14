@@ -214,7 +214,7 @@ pub fn bit_write<T, S>(
     //
     let mut fullness = bit_offset % 8;
     
-    // A counter that counts the number of bits written.
+    // A counter that counts the number bits remaining for recording.
     let mut cursor = bit_size;
     
     // Iterate affected bytes
@@ -225,6 +225,7 @@ pub fn bit_write<T, S>(
     for i in start_byte_index..(start_byte_index + affected_bytes_num) {
         loop {
             let mut index = source_len - meaningful_len;
+            // Number of bits already written
             let already_written = bit_size - cursor;
             if already_written >= bit_size % 8 && already_written > 0 {
                 index += 1;
