@@ -115,9 +115,11 @@ mod tests_is_in_range {
 }
 
 pub fn iter_bit_window() {
-   todo!() 
+   todo!()
 }
 
+/// Reset bits to zero in the range of `bit_size` 
+/// in target at the specified `bit_offset`
 pub fn bit_clean<T>(
     target: &mut T,
     bit_offset: usize,
@@ -126,6 +128,12 @@ pub fn bit_clean<T>(
     T: IndexMut<usize, Output = u8>
 {
     todo!()
+}
+
+mod tests_bit_clean {
+    use super::*;
+
+
 }
 
 /// Writes N bits from source to target by bit offset
@@ -159,13 +167,19 @@ pub fn bit_write<T, S>(
     let start_byte_index = bit_offset / 8;
     let slots_at_start_byte = 8 - bit_offset % 8;
 
-    let mut affected_bytes = 1;
+    // The number of bytes to which the recording will be performed
+    //     |
+    //     \-----------
+    // |b|b|pa|a|a|a|pa|b|b|
+    //
+    // NOTE: Minimum 1, since `bit_size` > 0
+    let mut affected_bytes_num = 1;
     let remainder = bit_size.saturating_sub(slots_at_start_byte);
     if remainder != 0 {
-        affected_bytes += remainder / 8;
+        affected_bytes_num += remainder / 8;
 
         if remainder % 8 > 0 {
-            affected_bytes += 1;
+            affected_bytes_num += 1;
         }
     }
 
@@ -175,7 +189,7 @@ pub fn bit_write<T, S>(
     }
     let mut fullness = bit_offset % 8;
     let mut cursor = bit_size;
-    for i in 0..affected_bytes {
+    for i in 0..affected_bytes_num {
         loop {
             let mut index = source_len - meaningful_len;
             let already_written = bit_size - cursor;
