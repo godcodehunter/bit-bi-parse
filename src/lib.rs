@@ -151,7 +151,7 @@ pub fn bit_write<T, S>(
     //              |
     //              |
     //              ----------
-    //  ... # |1|0|1|1|0|0|1|1| # |1|0|1|1|0|0|1|1| # ...
+    //  ... # |1|0|1|0|0|0|0|0| # |0|0|0|0|0|0|0|0| # ...
     //       \_________________/ \_________________/  
     //               |                   \
     //   first partially affected byte   next affected byte
@@ -288,6 +288,28 @@ pub fn bit_write<T, S>(
                 write_size = slots_in_target_byte;
                 fullness = 8;
 
+                // For example:
+                //   
+                // TARGET
+                //
+                //      already recorded (fullness == 3)
+                //       |
+                //  ------
+                //  |1|1|1|0|0|0|0|0|  
+                //         ---------
+                //        /
+                //  available_for_print 
+                //
+                //
+                // SOURCE
+                //
+                // |1|0|1|1|0|0|1|1|
+                // ---- -------------
+                // \                 \
+                //  already printed  slots_in_target_byte
+                //
+                // So we should shift printed byte by two to right
+                //
                 let shift = available_for_print - slots_in_target_byte;
                 target[target_index] |= (mask & source[source_index]) >> shift;
             }
