@@ -114,22 +114,6 @@ mod tests_is_in_range {
     }
 }
 
-pub fn iter_bit_window() {
-   todo!()
-}
-
-/// Reset bits to zero in the range of `bit_size` 
-/// in target at the specified `bit_offset`
-pub fn bit_clean<T>(
-    target: &mut T,
-    bit_offset: usize,
-    bit_size: usize,
-) where
-    T: IndexMut<usize, Output = u8>
-{
-    todo!()
-}
-
 /// Writes N bits from source to target by bit offset
 /// 
 /// **PANIC**: If requested bit_size large than source bit size
@@ -325,6 +309,18 @@ pub fn bit_write<T, S>(
             }
         }
     }
+}
+
+/// Reset bits to zero in the range of `bit_size` 
+/// in target at the specified `bit_offset`
+pub fn bit_clean<T>(
+    target: &mut T,
+    bit_offset: usize,
+    bit_size: usize,
+) where
+    T: IndexMut<usize, Output = u8>
+{
+    todo!()
 }
 
 #[cfg(test)]
