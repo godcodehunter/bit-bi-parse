@@ -284,6 +284,10 @@ pub fn bit_write<T, S>(
             let write_size;
             
             let mask = !0b11111111u8.checked_shl(available as u32).unwrap_or_default();
+            
+            // We handle the situation when there are more slots in TARGET than 
+            // slots in SOURCE. That is, we can write all the bits from the 
+            // SOURCE byte to the TARGET byte.
             if slots >= available {
                 write_size = available;
                 fullness += available;
