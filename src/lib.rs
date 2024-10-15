@@ -235,7 +235,7 @@ pub fn bit_write<T, S>(
             let already_written = bit_size - cursor;
 
             /*
-				CALCULATE now current index of byte being written
+                CALCULATE now current index of byte being written
             */
 
             // If `already_written` === 0, we haven't recorded anything yet.
@@ -264,7 +264,7 @@ pub fn bit_write<T, S>(
             }
 
             /*
-				CALCULATE END
+                CALCULATE END
             */
 
           
