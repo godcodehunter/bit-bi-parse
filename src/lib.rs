@@ -311,7 +311,7 @@ pub fn bit_write<T, S>(
                 // So we should shift printed byte by two to right
                 //
                 let shift = available_for_print - slots_in_target_byte;
-                target[target_index] |= (mask & source[source_index]) >> shift;
+                target[target_index] |= source[source_index] >> shift;
             }
 
             // Reduce by the amount of written
