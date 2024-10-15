@@ -240,8 +240,23 @@ pub fn bit_write<T, S>(
 
             // If `already_written` === 0, we haven't recorded anything yet.
             //
-            // 
+            // `already_written` >= `bit_size` % 8, handle that we write
+            // affected significant bit 
+            //
+            //  |b|b|pa|a|a|a|pa|b|b|
+            //       ^
+            //       |
+            //       |
+            //       /------------------\
+            //   ... # |1|0|1|1|0|0|1|1| # |1|0|1|1|0|0|1|1| # ...
+            //              -------------
+            //              |
+            //              bit for which will be recorded
+            //              from first partially affected byte
+            //
+            //
             if already_written >= bit_size % 8 && already_written > 0 {
+                
                 source_index += 1;
                 if already_written / 8 > 1 {
                     source_index += already_written / 8 - 1
