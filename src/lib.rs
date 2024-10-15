@@ -271,8 +271,14 @@ pub fn bit_write<T, S>(
                 CALCULATE END
             */
 
-          
+            // The available number of slots to which we will write 
+            // in the current byte in the TARGET
             let slots = if fullness != 0 { 8 - fullness } else { 8 };
+            
+            // Available for printing bit slots from SOURCE!
+            // The calculation algorithm is as follows if the remainder is zero. 
+            // We can write a whole byte, if there is a remainder, then it is 
+            // equal to the number of slots that be printed to target
             let available = if cursor % 8 != 0 { cursor % 8 } else { 8 };
 
             let write_size;
