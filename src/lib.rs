@@ -397,36 +397,36 @@ pub fn bit_clean<T>(
 {
     todo!("work incorrect");
     
-    if bit_size == 0 {
-        return;
-    }
+    // if bit_size == 0 {
+    //     return;
+    // }
     
-    let start_byte_index = bit_offset / 8;
-    let slots_at_start_byte = 8 - bit_offset % 8;
+    // let start_byte_index = bit_offset / 8;
+    // let slots_at_start_byte = 8 - bit_offset % 8;
     
-    let mut affected_bytes_num = 1;
-    let remainder = bit_size.saturating_sub(slots_at_start_byte);
-    if remainder != 0 {
-        affected_bytes_num += remainder / 8;
-        if remainder % 8 > 0 {
-            affected_bytes_num += 1;
-        }
-    }
+    // let mut affected_bytes_num = 1;
+    // let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    // if remainder != 0 {
+    //     affected_bytes_num += remainder / 8;
+    //     if remainder % 8 > 0 {
+    //         affected_bytes_num += 1;
+    //     }
+    // }
 
-    let last_byte_index = start_byte_index + affected_bytes_num;
-    let iter_range = start_byte_index..last_byte_index;
-    for target_index in iter_range {
-        let mut mask = 0b00000000u8;
-        if target_index ==  start_byte_index {
-            mask = 0b11111111u8 << slots_at_start_byte;
-        }
-        if target_index == last_byte_index - 1 && remainder % 8 > 0 {
-            let slots_at_last_byte = remainder - remainder/8*8;
-            mask = 0b11111111u8 >> slots_at_last_byte;
-        }
+    // let last_byte_index = start_byte_index + affected_bytes_num;
+    // let iter_range = start_byte_index..last_byte_index;
+    // for target_index in iter_range {
+    //     let mut mask = 0b00000000u8;
+    //     if target_index ==  start_byte_index {
+    //         mask = 0b11111111u8 << slots_at_start_byte;
+    //     }
+    //     if target_index == last_byte_index - 1 && remainder % 8 > 0 {
+    //         let slots_at_last_byte = remainder - remainder/8*8;
+    //         mask = 0b11111111u8 >> slots_at_last_byte;
+    //     }
 
-        target[target_index] &= mask;
-    }
+    //     target[target_index] &= mask;
+    // }
 }
 
 mod tests_bit_clean {
