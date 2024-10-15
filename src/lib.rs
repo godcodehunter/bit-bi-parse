@@ -367,17 +367,34 @@ pub fn bit_write<T, S>(
     }
 }
 
-#[test]
-fn check_bit_write() {
-    let mut target = [0u8; 2];
-    let source = u64::from_be_bytes([
-        0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
-        0b00000000, 0b00000111, 0b11111111,
-    ]);
+mod tests_bit_write {
+    use super::*;
 
-    let b_source = source.to_be_bytes();
-    bit_write(&mut target, 4, 11, &b_source, b_source.len());
-    assert_eq!(target, [0b00001111, 0b11111110]);
+    #[test]
+    fn write1() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000111, 0b11111111,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        bit_write(&mut target, 4, 11, &b_source, b_source.len());
+        assert_eq!(target, [0b00001111, 0b11111110]);
+    }
+
+    #[test]
+    fn write2() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000111,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        bit_write(&mut target, 3, 3, &b_source, b_source.len());
+        assert_eq!(target, [0b00011100, 0b00000000]);
+    }
 }
 
 /// Reset bits to zero in the range of `bit_size` 
@@ -421,17 +438,37 @@ pub fn bit_clean<T>(
     }
 }
 
-#[test]
-fn check_bit_clean() {
-    let mut target = [
-        0b00000111, 0b11111111, 0b11100000, 0b00000000
-    ];
-    
-    bit_clean(&mut target, 5, 3 + 8 + 3);
-    let expected = [0b00000000, 0b00000000, 0b00000000, 0b00000000];
-    assert_eq!(expected, target);
-}
+mod tests_bit_clean {
+    use super::*;
 
+    #[test]
+    fn check_intersection() {
+        let mut target = [
+            0b00000111, 0b11111111, 0b11100000, 0b00000000
+        ];
+        
+        bit_clean(&mut target, 5, 3 + 8 + 3);
+        let expected = [0b00000000, 0b00000000, 0b00000000, 0b00000000];
+        assert_eq!(expected, target);
+    }
+
+    #[test]
+    fn check_small() {
+        let mut target = [
+            0b00000111, 0b11111111, 0b11100000, 0b00000000
+        ]; 
+
+        bit_clean(&mut target, 11, 3);
+        let expected = [0b00000111, 0b11100011, 0b11100000, 0b00000000];
+        
+        // TODO: ...
+        // for &num in target.iter() {
+        //     println!("{:08b}", num); // Print each number as an 8-bit binary string
+        // }
+        
+        assert_eq!(expected, target)
+    }
+}
 
 pub fn bit_read<T, S>(
     source: &T,
