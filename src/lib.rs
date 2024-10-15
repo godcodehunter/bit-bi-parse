@@ -410,15 +410,29 @@ pub fn bit_clean<T>(
     for target_index in iter_range {
         let mut mask = 0b00000000u8;
         if target_index ==  start_byte_index {
-            // mask = 0b11111111u8 << todo!();
+            mask = 0b11111111u8 << slots_at_start_byte;
         }
-        if target_index == last_byte_index - 1 {
-            // mask = 0b11111111u8 >> todo!();
-        }
+        // if target_index == last_byte_index - 1 {
+        //     mask = 0b11111111u8 >> todo!();
+        // }
 
         target[target_index] &= mask;
     }
 }
+
+#[test]
+fn check_bit_clean() {
+    // let mut target = [0u8; 2];
+    // let source = u64::from_be_bytes([
+    //     0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+    //     0b00000000, 0b00000111, 0b11111111,
+    // ]);
+
+    // let b_source = source.to_be_bytes();
+    // bit_write(&mut target, 4, 11, &b_source, b_source.len());
+    // assert_eq!(target, [0b00001111, 0b11111110]);
+}
+
 
 pub fn bit_read<T, S>(
     source: &T,
