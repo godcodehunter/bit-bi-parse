@@ -263,22 +263,22 @@ pub fn bit_write<T, S>(
             // The calculation algorithm is as follows if the remainder is zero. 
             // We can write a whole byte, if there is a remainder, then it is 
             // equal to the number of slots that be printed to target
-            let available = if cursor % 8 != 0 { cursor % 8 } else { 8 };
+            let available_for_print = if cursor % 8 != 0 { cursor % 8 } else { 8 };
 
             let write_size;
             
-            let mask = !0b11111111u8.checked_shl(available as u32).unwrap_or_default();
+            let mask = !0b11111111u8.checked_shl(available_for_print as u32).unwrap_or_default();
             
             // We handle the situation when there are more slots in TARGET than 
             // slots in SOURCE. That is, we can write all the bits from the 
             // SOURCE byte to the TARGET byte.
-            if slots_in_target_byte >= available {
+            if slots_in_target_byte >= available_for_print {
                 // We will record the `available` number of bits, track it
-                write_size = available;
+                write_size = available_for_print;
                 // Also let's change the `fullness` by the amount available
-                fullness += available;
+                fullness += available_for_print;
                 
-                let shift = slots_in_target_byte - available;
+                let shift = slots_in_target_byte - available_for_print;
                 target[target_index] |= (mask & source[source_index]) << shift;
 
             // There are not enough slots in the TARGET byte, 
@@ -288,7 +288,7 @@ pub fn bit_write<T, S>(
                 write_size = slots_in_target_byte;
                 fullness = 8;
 
-                let shift = available - slots_in_target_byte;
+                let shift = available_for_print - slots_in_target_byte;
                 target[target_index] |= (mask & source[source_index]) >> shift;
             }
 
