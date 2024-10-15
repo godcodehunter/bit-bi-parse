@@ -257,8 +257,10 @@ pub fn bit_write<T, S>(
             //
             //
             if already_written >= bit_size % 8 && already_written > 0 {
-                
+                // If record bit from first partially affected byte
+                // from source add to index one
                 source_index += 1;
+
                 if already_written / 8 > 1 {
                     source_index += already_written / 8 - 1
                 }
