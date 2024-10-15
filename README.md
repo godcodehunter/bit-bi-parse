@@ -168,3 +168,11 @@ With use codegen macro:
 ```rust
 	//TODO
 ```
+
+Similar libraries:
+
+- https://lib.rs/crates/nom
+- https://lib.rs/crates/bitvec
+- https://lib.rs/crates/bitstream-io + https://lib.rs/crates/tokio-bitstream-io
+- https://lib.rs/crates/bitreader
+- https://lib.rs/crates/bitter

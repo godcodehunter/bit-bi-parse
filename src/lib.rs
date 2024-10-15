@@ -238,6 +238,9 @@ pub fn bit_write<T, S>(
 				CALCULATE now current index of byte being written
 			*/
 
+            // If `already_written` === 0, we haven't recorded anything yet.
+            //
+            // 
             if already_written >= bit_size % 8 && already_written > 0 {
                 source_index += 1;
                 if already_written / 8 > 1 {
