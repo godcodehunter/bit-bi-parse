@@ -268,7 +268,7 @@ pub fn bit_write<T, S>(
             let write_size;
             
             let mask = !0b11111111u8.checked_shl(available_for_print as u32).unwrap_or_default();
-            
+
             // We handle the situation when there are more slots in TARGET than 
             // slots in SOURCE. That is, we can write all the bits from the 
             // SOURCE byte to the TARGET byte.
@@ -278,6 +278,29 @@ pub fn bit_write<T, S>(
                 // Also let's change the `fullness` by the amount available
                 fullness += available_for_print;
                 
+                // For example:
+                //
+                // TARGET
+                // 
+                //      already recorded (fullness == 3)
+                //       |
+                //  ------
+                // |1|1|1|0|0|0|0|0| 
+                //        ---------
+                //                 \
+                //                 slots_in_target_byte
+                // SOURCE
+                //
+                // |1|0|1|1|0|0|1|1|
+                //  ------- --------
+                // |                \
+                // |               available_for_print
+                // already printed
+                //
+                // So we should:
+                //  - remove already printed bit by mask (because otherwise there will be an intersection)
+                //  - shift printed byte by one to left
+                //
                 let shift = slots_in_target_byte - available_for_print;
                 target[target_index] |= (mask & source[source_index]) << shift;
 
@@ -342,6 +365,7 @@ pub fn bit_clean<T>(
 ) where
     T: IndexMut<usize, Output = u8>
 {
+    // 
     todo!()
 }
 
