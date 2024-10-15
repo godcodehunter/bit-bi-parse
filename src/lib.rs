@@ -261,6 +261,7 @@ pub fn bit_write<T, S>(
                 // from source add to index one
                 source_index += 1;
 
+                // If you wrote more than 1 byte, add the remaining ones
                 if already_written / 8 > 1 {
                     source_index += already_written / 8 - 1
                 }
