@@ -406,6 +406,8 @@ pub fn bit_clean<T>(
 ) where
     T: IndexMut<usize, Output = u8>
 {
+    todo!("work incorrect");
+    
     if bit_size == 0 {
         return;
     }
