@@ -306,6 +306,9 @@ pub fn bit_write<T, S>(
                 return;
             }
 
+            // We have completely filled the byte in TARGET, 
+            // there is nowhere else to write, we move on 
+            // to the next byte in TARGET
             if fullness == 8 {
                 fullness = 0;
                 break;
