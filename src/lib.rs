@@ -236,7 +236,7 @@ pub fn bit_write<T, S>(
 
             /*
 				CALCULATE now current index of byte being written
-			*/
+            */
 
             // If `already_written` === 0, we haven't recorded anything yet.
             //
@@ -256,7 +256,7 @@ pub fn bit_write<T, S>(
             //
             //
             if already_written >= bit_size % 8 && already_written > 0 {
-                
+
                 source_index += 1;
                 if already_written / 8 > 1 {
                     source_index += already_written / 8 - 1
@@ -265,7 +265,7 @@ pub fn bit_write<T, S>(
 
             /*
 				CALCULATE END
-			*/
+            */
 
           
             let slots = if fullness != 0 { 8 - fullness } else { 8 };
