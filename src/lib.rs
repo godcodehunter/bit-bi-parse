@@ -206,7 +206,8 @@ pub fn bit_write<T, S>(
     // |b|b|pa|a|a|a|pa|b|b|
     //      ^  ^ ^ ^ ^
     //      --------->
-    let iter_range = start_byte_index..(start_byte_index + affected_bytes_num);
+    let last_byte_index = start_byte_index + affected_bytes_num;
+    let iter_range = start_byte_index..last_byte_index;
     for target_index in iter_range {
         loop {
        
@@ -366,6 +367,19 @@ pub fn bit_write<T, S>(
     }
 }
 
+#[test]
+fn check_bit_write() {
+    let mut target = [0u8; 2];
+    let source = u64::from_be_bytes([
+        0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+        0b00000000, 0b00000111, 0b11111111,
+    ]);
+
+    let b_source = source.to_be_bytes();
+    bit_write(&mut target, 4, 11, &b_source, b_source.len());
+    assert_eq!(target, [0b00001111, 0b11111110]);
+}
+
 /// Reset bits to zero in the range of `bit_size` 
 /// in target at the specified `bit_offset`
 pub fn bit_clean<T>(
@@ -375,25 +389,34 @@ pub fn bit_clean<T>(
 ) where
     T: IndexMut<usize, Output = u8>
 {
-    // 
-    todo!()
-}
+    if bit_size == 0 {
+        return;
+    }
+    
+    let start_byte_index = bit_offset / 8;
+    let slots_at_start_byte = 8 - bit_offset % 8;
+    
+    let mut affected_bytes_num = 1;
+    let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    if remainder != 0 {
+        affected_bytes_num += remainder / 8;
+        if remainder % 8 > 0 {
+            affected_bytes_num += 1;
+        }
+    }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+    let last_byte_index = start_byte_index + affected_bytes_num;
+    let iter_range = start_byte_index..last_byte_index;
+    for target_index in iter_range {
+        let mut mask = 0b00000000u8;
+        if target_index ==  start_byte_index {
+            // mask = 0b11111111u8 << todo!();
+        }
+        if target_index == last_byte_index - 1 {
+            // mask = 0b11111111u8 >> todo!();
+        }
 
-    #[test]
-    fn it_works() {
-        let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
-            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000111,
-            0b11111111,
-        ]);
-
-        let b_source = source.to_be_bytes();
-        bit_write(&mut target, 4, 11, &b_source, b_source.len());
-        assert_eq!(target, [0b00001111, 0b11111110]);
+        target[target_index] &= mask;
     }
 }
 
