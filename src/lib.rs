@@ -273,7 +273,7 @@ pub fn bit_write<T, S>(
 
             // The available number of slots to which we will write 
             // in the current byte in the TARGET
-            let slots = if fullness != 0 { 8 - fullness } else { 8 };
+            let slots_in_target_byte = if fullness != 0 { 8 - fullness } else { 8 };
             
             // Available for printing bit slots from SOURCE!
             // The calculation algorithm is as follows if the remainder is zero. 
@@ -288,17 +288,23 @@ pub fn bit_write<T, S>(
             // We handle the situation when there are more slots in TARGET than 
             // slots in SOURCE. That is, we can write all the bits from the 
             // SOURCE byte to the TARGET byte.
-            if slots >= available {
+            if slots_in_target_byte >= available {
+                // We will record the `available` number of bits, track it
                 write_size = available;
+                // Also let's change the `fullness` by the amount available
                 fullness += available;
                 
-                let shift = slots - available;
+                let shift = slots_in_target_byte - available;
                 target[target_index] |= (mask & source[source_index]) << shift;
+
+            // There are not enough slots in the TARGET byte, 
+            // we can only write part of the SOURCE
             } else {
-                write_size = slots;
+                // We will record the `slots_in_target_byte` number of bits, track it
+                write_size = slots_in_target_byte;
                 fullness = 8;
 
-                let shift = available - slots;
+                let shift = available - slots_in_target_byte;
                 target[target_index] |= (mask & source[source_index]) >> shift;
             }
 
