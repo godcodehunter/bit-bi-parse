@@ -360,7 +360,7 @@ mod tests_bit_write {
     use super::*;
 
     #[test]
-    fn write1() {
+    fn heck_intersection() {
         let mut target = [0u8; 2];
         let source = u64::from_be_bytes([
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -373,7 +373,7 @@ mod tests_bit_write {
     }
 
     #[test]
-    fn write2() {
+    fn heck_small() {
         let mut target = [0u8; 2];
         let source = u64::from_be_bytes([
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -397,36 +397,41 @@ pub fn bit_clean<T>(
 {
     todo!("work incorrect");
     
-    // if bit_size == 0 {
-    //     return;
-    // }
+    if bit_size == 0 {
+        return;
+    }
     
-    // let start_byte_index = bit_offset / 8;
-    // let slots_at_start_byte = 8 - bit_offset % 8;
+    let start_byte_index = bit_offset / 8;
+    let slots_at_start_byte = 8 - bit_offset % 8;
     
-    // let mut affected_bytes_num = 1;
-    // let remainder = bit_size.saturating_sub(slots_at_start_byte);
-    // if remainder != 0 {
-    //     affected_bytes_num += remainder / 8;
-    //     if remainder % 8 > 0 {
-    //         affected_bytes_num += 1;
-    //     }
-    // }
+    let mut affected_bytes_num = 1;
+    let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    if remainder != 0 {
+        affected_bytes_num += remainder / 8;
+        if remainder % 8 > 0 {
+            affected_bytes_num += 1;
+        }
+    }
 
-    // let last_byte_index = start_byte_index + affected_bytes_num;
-    // let iter_range = start_byte_index..last_byte_index;
-    // for target_index in iter_range {
-    //     let mut mask = 0b00000000u8;
-    //     if target_index ==  start_byte_index {
-    //         mask = 0b11111111u8 << slots_at_start_byte;
-    //     }
-    //     if target_index == last_byte_index - 1 && remainder % 8 > 0 {
-    //         let slots_at_last_byte = remainder - remainder/8*8;
-    //         mask = 0b11111111u8 >> slots_at_last_byte;
-    //     }
+    // If we touch only one byte
+    if todo!() {
 
-    //     target[target_index] &= mask;
-    // }
+    }
+
+    let last_byte_index = start_byte_index + affected_bytes_num;
+    let iter_range = start_byte_index..last_byte_index;
+    for target_index in iter_range {
+        let mut mask = 0b00000000u8;
+        if target_index ==  start_byte_index {
+            mask = 0b11111111u8 << slots_at_start_byte;
+        }
+        if target_index == last_byte_index - 1 && remainder % 8 > 0 {
+            let slots_at_last_byte = remainder - remainder/8*8;
+            mask = 0b11111111u8 >> slots_at_last_byte;
+        }
+
+        target[target_index] &= mask;
+    }
 }
 
 mod tests_bit_clean {
