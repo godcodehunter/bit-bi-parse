@@ -586,3 +586,17 @@ pub fn bit_read<T, S>(
         }
     }
 }
+
+#[test]
+fn check_bit_read() {
+    let source = [
+        0b00000111, 0b11111101, 0b11100000, 0b00000000
+    ];
+    let mut expected = [0u8; 4];
+
+    let len = expected.len();
+    bit_read(&source, 12, 4, &mut expected, len);
+
+    let expected = [0b00000000, 0b00000000, 0b00000000, 0b00001101];
+    assert_eq!(expected, source);
+}
