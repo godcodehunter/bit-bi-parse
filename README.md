@@ -143,16 +143,16 @@ Example simple parser:
     	fn try_from(bytes: [u8; 14]) -> Result<Self, Self::Error> {
 			// TODO: ...
 			bit_read(&bytes, offset, 6, &mut bytes, b_field1_len);
-        	offset += 6;
+			offset += 6;
 
 			bit_read(&bytes, offset, 32, &mut target.field2, b_field2_len);
-        	offset += 32;
+			offset += 32;
 
 			bit_read(&bytes, offset, 4, &mut target.field3, b_field3_len);
-        	offset += 4;
+			offset += 4;
 
 			bit_read(&bytes, offset, 64, &mut target.field4, b_field4_len);
-        	offset += 64;
+			offset += 64;
 
 			bit_read(&bytes, offset, 6, &mut target.field5, b_field5_len);
 
