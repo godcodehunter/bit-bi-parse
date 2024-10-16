@@ -454,6 +454,17 @@ mod tests_bit_clean {
     }
 
     #[test]
+    fn check_without_last() {
+        let mut target = [
+            0b00000111, 0b11111111, 0b11100000, 0b00000000
+        ];
+        
+        bit_clean(&mut target, 5, 3 + 8);
+        let expected = [0b00000000, 0b00000000, 0b11100000, 0b00000000];
+        assert_eq!(expected, target);
+    }
+
+    #[test]
     fn check_one_byte_small() {
         let mut target = [
             0b00000111, 0b11111111, 0b11100000, 0b00000000
