@@ -140,7 +140,7 @@ Example simple parser:
 	impl TryFrom<[u8; 14]> for Sample {
     	type Error = ();
 
-    	fn try_from(bytes: [u8; 14]) -> Result<Self, Self::Error> {
+		fn try_from(bytes: [u8; 14]) -> Result<Self, Self::Error> {
 			// TODO: ...
 			bit_read(&bytes, offset, 6, &mut bytes, b_field1_len);
 			offset += 6;
