@@ -418,7 +418,7 @@ pub fn bit_clean<T>(
     if affected_bytes_num == 1 {
         let mut mask = 0b00000000;
         mask |= 0b11111111 << slots_at_start_byte;
-        mask |= 0b11111111 >> (bit_offset + bit_size);
+        mask |= 0b11111111 >> (bit_offset % 8 + bit_size);
 
         target[start_byte_index] &= mask;
         
@@ -472,12 +472,7 @@ mod tests_bit_clean {
 
         bit_clean(&mut target, 11, 3);
         let expected = [0b00000111, 0b11100011, 0b11100000, 0b00000000];
-        
-        // TODO: ...
-        // for &num in target.iter() {
-        //     println!("{:08b}", num); // Print each number as an 8-bit binary string
-        // }
-        
+         
         assert_eq!(expected, target)
     }
 
