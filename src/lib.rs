@@ -395,8 +395,6 @@ pub fn bit_clean<T>(
 ) where
     T: IndexMut<usize, Output = u8>
 {
-    todo!("work incorrect");
-    
     if bit_size == 0 {
         return;
     }
@@ -413,21 +411,28 @@ pub fn bit_clean<T>(
         }
     }
 
-    // If we touch only one byte
-    if todo!() {
-
-    }
-
     let last_byte_index = start_byte_index + affected_bytes_num;
     let iter_range = start_byte_index..last_byte_index;
+
+    // If we touch only one byte
+    if affected_bytes_num == 1 {
+        let mut mask = 0b00000000;
+        mask |= 0b11111111 << slots_at_start_byte;
+        // mask |= 0b11111111 >> rsh;
+
+        target[start_byte_index] &= mask;
+        
+        return;
+    }
+
     for target_index in iter_range {
-        let mut mask = 0b00000000u8;
+        let mut mask = 0b00000000;
         if target_index ==  start_byte_index {
-            mask = 0b11111111u8 << slots_at_start_byte;
+            mask = 0b11111111 << slots_at_start_byte;
         }
         if target_index == last_byte_index - 1 && remainder % 8 > 0 {
             let slots_at_last_byte = remainder - remainder/8*8;
-            mask = 0b11111111u8 >> slots_at_last_byte;
+            mask = 0b11111111 >> slots_at_last_byte;
         }
 
         target[target_index] &= mask;
@@ -449,13 +454,30 @@ mod tests_bit_clean {
     }
 
     #[test]
-    fn check_small() {
+    fn check_one_byte_small() {
         let mut target = [
             0b00000111, 0b11111111, 0b11100000, 0b00000000
         ]; 
 
         bit_clean(&mut target, 11, 3);
         let expected = [0b00000111, 0b11100011, 0b11100000, 0b00000000];
+        
+        // TODO: ...
+        // for &num in target.iter() {
+        //     println!("{:08b}", num); // Print each number as an 8-bit binary string
+        // }
+        
+        assert_eq!(expected, target)
+    }
+
+    #[test]
+    fn check_last() {
+        let mut target = [
+            0b00000111, 0b11111111, 0b11100000, 0b00000000
+        ]; 
+
+        bit_clean(&mut target, 16, 3);
+        let expected = [0b00000111, 0b11111111, 0b00000000, 0b00000000];
         
         // TODO: ...
         // for &num in target.iter() {
