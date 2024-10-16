@@ -1,6 +1,6 @@
 Very simple library for binary printer/parser.
 
-![alt text](./principle.png)
+![alt text](./doc/asserts/principle.png)
 
 Example simple printer:
 

@@ -457,7 +457,7 @@ pub fn bit_clean<T>(
     for target_index in iter_range {
         let mut mask = 0b00000000;
         if target_index ==  start_byte_index {
-            mask = 0b11111111u8.checked_shl(slots_at_start_byte as u32).unwrap_or_default();; 
+            mask = 0b11111111u8.checked_shl(slots_at_start_byte as u32).unwrap_or_default(); 
         }
         if target_index == last_byte_index - 1 && remainder % 8 > 0 {
             let slots_at_last_byte = remainder - remainder/8*8;
