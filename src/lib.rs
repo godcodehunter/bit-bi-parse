@@ -416,9 +416,37 @@ pub fn bit_clean<T>(
 
     // If we touch only one byte
     if affected_bytes_num == 1 {
+        //
+        // For example:
+        //
+        //    slots_at_start_byte
+        //      \
+        //       -----------
+        //       |         |
+        // |1|1|1|1|1|1|1|1|
+        // |     |     |   
+        //  ----- -----
+        //    |     \
+        //    |      bit_size (content)
+        //     \      
+        //   bit_offset % 8             
+        //
+        // So, mask composed from two part
         let mut mask = 0b00000000;
+        // First we shift << slots_at_start_byte, for doesn't touch some ahead bits
+        //
+        //  |1|1|1|0|0|0|0|0|
+        //
         mask |= 0b11111111u8.checked_shl(slots_at_start_byte as u32).unwrap_or_default();
+        // Second we shift >> bit_offset % 8 + bit_size, for doesn't touch some postponed bits
+        //
+        // |0|0|0|0|0|0|1|1|
+        //
         let rsh = bit_offset % 8 + bit_size;
+        // End here finally
+        //
+        // |1|1|1|0|0|0|1|1|
+        // 
         mask |= 0b11111111u8.checked_shr(rsh as u32).unwrap_or_default();
 
         target[start_byte_index] &= mask;
