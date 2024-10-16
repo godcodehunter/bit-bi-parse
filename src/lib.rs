@@ -514,10 +514,6 @@ mod tests_bit_clean {
         bit_clean(&mut target, 16, 3);
         let expected = [0b00000111, 0b11111111, 0b00000000, 0b00000000];
         
-        for &num in target.iter() {
-            println!("{:08b}", num); 
-        }
-        
         assert_eq!(expected, target)
     }
 
@@ -530,9 +526,18 @@ mod tests_bit_clean {
         bit_clean(&mut target, 21, 3);
         let expected = [0b00000111, 0b11111111, 0b00000000, 0b00000000];
         
-        for &num in target.iter() {
-            println!("{:08b}", num); 
-        }
+        assert_eq!(expected, target)
+    }
+
+    #[test]
+    fn check_first_filled() {
+        let mut target = [
+            0b11111111, 0b11111111, 0b00000000, 0b00000000
+        ]; 
+
+        bit_clean(&mut target, 0, 16);
+        let expected = [0b00000000, 0b00000000, 0b00000000, 0b00000000];
+        
         
         assert_eq!(expected, target)
     }
