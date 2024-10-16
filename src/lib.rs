@@ -411,9 +411,6 @@ pub fn bit_clean<T>(
         }
     }
 
-    let last_byte_index = start_byte_index + affected_bytes_num;
-    let iter_range = start_byte_index..last_byte_index;
-
     // If we touch only one byte
     if affected_bytes_num == 1 {
         //
@@ -453,6 +450,9 @@ pub fn bit_clean<T>(
         
         return;
     }
+
+    let last_byte_index = start_byte_index + affected_bytes_num;
+    let iter_range = start_byte_index..last_byte_index;
 
     for target_index in iter_range {
         let mut mask = 0b00000000;
@@ -542,6 +542,10 @@ mod tests_bit_clean {
     }
 }
 
+/// Read N bits from source to target by bit offset
+///
+/// **NOTE**: It is assumed that the target is prepared for writing, i.e., 
+/// for example, no cleaning is applied
 pub fn bit_read<T, S>(
     source: &T,
     bit_offset: usize,
@@ -549,8 +553,36 @@ pub fn bit_read<T, S>(
     target: &mut S,
     target_len: usize,
 ) where
-    T: IndexMut<usize, Output = u8>,
-    S: Index<usize, Output = u8>,
+    T: Index<usize, Output = u8>,
+    S: IndexMut<usize, Output = u8>,
 {
-    todo!()
+    if bit_size == 0 {
+        return;
+    }
+
+    assert!(
+        bit_size <= target_len * 8,
+        "bit_size large than target bit size"
+    );
+
+    let start_byte_index = bit_offset / 8;
+    let slots_at_start_byte = 8 - bit_offset % 8;
+
+    let mut affected_bytes_num = 1;
+    let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    if remainder != 0 {
+        affected_bytes_num += remainder / 8;
+        if remainder % 8 > 0 {
+            affected_bytes_num += 1;
+        }
+    }
+
+    let last_byte_index = start_byte_index + affected_bytes_num;
+    let iter_range = start_byte_index..last_byte_index;
+    for source_index in iter_range {
+        loop {
+            todo!();
+            // target[0] |= source[source_index];
+        }
+    }
 }
