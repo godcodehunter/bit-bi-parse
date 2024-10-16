@@ -128,7 +128,7 @@ Example simple printer:
 
 Example simple parser:
 
-<!-- ```rust
+```rust
 	struct Sample {
 		field1: u64,
 		field2: u64,
@@ -138,11 +138,10 @@ Example simple parser:
 	}
 
 	impl TryFrom<[u8; 14]> for Sample {
-    	type Error = Vec<&'static str>;
+    	type Error = ();
 
     	fn try_from(bytes: [u8; 14]) -> Result<Self, Self::Error> {
-			let mut target: Sample = Default::default();
-
+			// TODO: ...
 			bit_read(&bytes, offset, 6, &mut bytes, b_field1_len);
         	offset += 6;
 
@@ -157,17 +156,17 @@ Example simple parser:
 
 			bit_read(&bytes, offset, 6, &mut target.field5, b_field5_len);
 
-			Ok(target)
+			Ok(Sample {
+				field1: todo(),
+				field2: todo(),
+				field3: todo(),
+				field4: todo(),
+				field5: todo(),
+			})
 		}
 	}
 
-``` -->
-
-With use codegen macro:
-
-```rust
-	//TODO
-```
+``` 
 
 Similar libraries:
 
