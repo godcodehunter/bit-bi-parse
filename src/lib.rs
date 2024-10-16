@@ -418,7 +418,7 @@ pub fn bit_clean<T>(
     if affected_bytes_num == 1 {
         let mut mask = 0b00000000;
         mask |= 0b11111111u8.checked_shl(slots_at_start_byte as u32).unwrap_or_default();
-        let rsh = (bit_offset % 8 + bit_size);
+        let rsh = bit_offset % 8 + bit_size;
         mask |= 0b11111111u8.checked_shr(rsh as u32).unwrap_or_default();
 
         target[start_byte_index] &= mask;
