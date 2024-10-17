@@ -128,7 +128,7 @@ Example simple printer:
 
 Example simple parser:
 
-```rust
+<!-- ```rust
 	struct Sample {
 		field1: u64,
 		field2: u64,
@@ -166,7 +166,7 @@ Example simple parser:
 		}
 	}
 
-``` 
+```  -->
 
 Similar libraries:
 
