@@ -115,19 +115,19 @@ mod tests_is_in_range {
 pub fn bit_write<T, S>(
     target: &mut T,
     target_bit_offset: usize,
-    bit_size: usize,
+    recordable_bit_size: usize,
     source: &S,
     byte_source_len: usize,
 ) where
     T: IndexMut<usize, Output = u8>,
     S: Index<usize, Output = u8>,
 {
-    if bit_size == 0 {
+    if recordable_bit_size == 0 {
         return;
     }
 
     assert!(
-        bit_size <= byte_source_len * 8,
+        recordable_bit_size <= byte_source_len * 8,
         "bit_size large than source bit size"
     );
 
@@ -158,7 +158,7 @@ pub fn bit_write<T, S>(
     // NOTE: we use here saturating subtraction, because
     // we have a situation where there are enough 
     // slots in the first partially affected byte for recording
-    let remainder = bit_size.saturating_sub(slots_at_start_byte);
+    let remainder = recordable_bit_size.saturating_sub(slots_at_start_byte);
     
     // Check the situation described in the note above 
     if remainder != 0 {
@@ -172,8 +172,8 @@ pub fn bit_write<T, S>(
     }
 
     // We calculate the length of the written body in bytes (rounding up)
-    let mut meaningful_len = bit_size / 8;
-    if bit_size % 8 > 0 {
+    let mut meaningful_len = recordable_bit_size / 8;
+    if recordable_bit_size % 8 > 0 {
         meaningful_len += 1;
     }
 
@@ -188,7 +188,7 @@ pub fn bit_write<T, S>(
     let mut fullness = target_bit_offset % 8;
     
     // A counter that counts the number bits remaining for recording.
-    let mut cursor = bit_size;
+    let mut cursor = recordable_bit_size;
     
     // Iterate affected bytes
     //
@@ -206,7 +206,7 @@ pub fn bit_write<T, S>(
             let mut source_index = byte_source_len - meaningful_len;
             
             // Number of bits already written
-            let already_written = bit_size - cursor;
+            let already_written = recordable_bit_size - cursor;
 
             /*
                 CALCULATE now current index of byte being written
@@ -230,7 +230,7 @@ pub fn bit_write<T, S>(
             //              from first partially affected byte
             //
             //
-            if already_written >= bit_size % 8 && already_written > 0 {
+            if already_written >= recordable_bit_size % 8 && already_written > 0 {
                 // If record bit from first partially affected byte
                 // from source add to index one
                 source_index += 1;
