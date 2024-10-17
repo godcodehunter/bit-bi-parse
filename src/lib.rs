@@ -114,7 +114,7 @@ mod tests_is_in_range {
 /// for example, no cleaning is applied
 pub fn bit_write<T, S>(
     target: &mut T,
-    bit_offset: usize,
+    target_bit_offset: usize,
     bit_size: usize,
     source: &S,
     byte_source_len: usize,
@@ -133,7 +133,7 @@ pub fn bit_write<T, S>(
 
     // The index of the first byte of bytes to which 
     // the recording will be performed
-    let start_byte_index = bit_offset / 8;
+    let start_byte_index = target_bit_offset / 8;
 
     // If we imagine that `bit_offset` is 3, then 
     // there are 5 slots (bits in which we write)
@@ -145,7 +145,7 @@ pub fn bit_write<T, S>(
     //               |                   \
     //   first partially affected byte   next affected byte
     //
-    let slots_at_start_byte = 8 - bit_offset % 8;
+    let slots_at_start_byte = 8 - target_bit_offset % 8;
 
     // The number of bytes to which the recording will be performed
     //     |
@@ -185,7 +185,7 @@ pub fn bit_write<T, S>(
     // ------/
     // |1|1|1|0|0|0|0|0| 
     //
-    let mut fullness = bit_offset % 8;
+    let mut fullness = target_bit_offset % 8;
     
     // A counter that counts the number bits remaining for recording.
     let mut cursor = bit_size;
