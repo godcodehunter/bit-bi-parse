@@ -105,10 +105,7 @@ mod tests_is_in_range {
 
 /// Writes N bits from source to target by bit offset
 /// 
-/// **PANIC**: If requested bit_size large than source bit size
-///
-/// **NOTE**: For the source, it does not check if the value exceeds the possible range,
-/// that is, the most significant bits, that out of `bit_size`, are simply discarded.
+/// **PANIC**: If out of range target or source
 /// 
 /// **NOTE**: It is assumed that the target is prepared for writing, i.e., 
 /// for example, no cleaning is applied
@@ -117,7 +114,7 @@ pub fn bit_write<T, S>(
     target_bit_offset: usize,
     recordable_bit_size: usize,
     source: &S,
-    byte_source_len: usize,
+    source_bit_offset: usize,
 ) where
     T: IndexMut<usize, Output = u8>,
     S: Index<usize, Output = u8>,
@@ -125,11 +122,6 @@ pub fn bit_write<T, S>(
     if recordable_bit_size == 0 {
         return;
     }
-
-    assert!(
-        recordable_bit_size <= byte_source_len * 8,
-        "bit_size large than source bit size"
-    );
 
     // The index of the first byte of bytes to which 
     // the recording will be performed
@@ -171,12 +163,6 @@ pub fn bit_write<T, S>(
         }
     }
 
-    // We calculate the length of the written body in bytes (rounding up)
-    let mut meaningful_len = recordable_bit_size / 8;
-    if recordable_bit_size % 8 > 0 {
-        meaningful_len += 1;
-    }
-
     // Counter of the number of slots already occupied 
     // in the current byte. Here we initialize for
     // first partially affected byte
@@ -203,7 +189,7 @@ pub fn bit_write<T, S>(
             // Calculate index of first byte being written
             // NOTE: `source_len` can be bigger than `meaningful_len`, 
             // so the most significant byte is simply discarded. 
-            let mut source_index = byte_source_len - meaningful_len;
+            let mut source_index = source_bit_offset / 8;
             
             // Number of bits already written
             let already_written = recordable_bit_size - cursor;
@@ -368,7 +354,16 @@ mod tests_bit_write {
         ]);
 
         let b_source = source.to_be_bytes();
-        bit_write(&mut target, 4, 11, &b_source, b_source.len());
+        
+        let recordable_bit_size = 11;
+        let source_bit_offset = b_source.len()*8 - recordable_bit_size;
+        bit_write(
+            &mut target, 
+            4, 
+            recordable_bit_size, 
+            &b_source, 
+            source_bit_offset,
+        );
         assert_eq!(target, [0b00001111, 0b11111110]);
     }
 
@@ -381,7 +376,42 @@ mod tests_bit_write {
         ]);
 
         let b_source = source.to_be_bytes();
-        bit_write(&mut target, 3, 3, &b_source, b_source.len());
+        
+        let recordable_bit_size = 3;
+        let source_bit_offset = b_source.len()*8 - recordable_bit_size;
+        bit_write(
+            &mut target,
+             3, 
+             recordable_bit_size, 
+             &b_source, 
+             source_bit_offset,
+        );
+        assert_eq!(target, [0b00011100, 0b00000000]);
+    }
+
+    #[test]
+    fn heck_custom_offset() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00111000, 0b00000000,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        
+        let source_bit_offset = b_source.len()*6 +2;
+        bit_write(
+            &mut target,
+             3, 
+             3, 
+             &b_source, 
+             source_bit_offset,
+        );
+
+        for &num in target.iter() {
+            println!("{:08b}", num); 
+        }
+
         assert_eq!(target, [0b00011100, 0b00000000]);
     }
 }
