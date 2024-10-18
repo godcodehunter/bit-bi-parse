@@ -171,7 +171,7 @@ pub fn bit_write<T, S>(
     // ------/
     // |1|1|1|0|0|0|0|0| 
     //
-    let mut fullness = target_bit_offset % 8;
+    let mut target_fullness = target_bit_offset % 8;
     
     // A counter that counts the number bits remaining for recording.
     let mut cursor = recordable_bit_size;
@@ -233,13 +233,17 @@ pub fn bit_write<T, S>(
 
             // The available number of slots to which we will write 
             // in the current byte in the TARGET
-            let slots_in_target_byte = if fullness != 0 { 8 - fullness } else { 8 };
+            let slots_in_target_byte = if target_fullness != 0 { 8 - target_fullness } else { 8 };
             
+            let source_lhs_shift = (source_bit_offset + already_written) % 8;
+
             // Available for printing bit slots from SOURCE!
-            // The calculation algorithm is as follows if the remainder is zero. 
-            // We can write a whole byte, if there is a remainder, then it is 
-            // equal to the number of slots that be printed to target
-            let available_for_print = if cursor % 8 != 0 { cursor % 8 } else { 8 };
+            let available_for_print;
+            if 8 - source_lhs_shift >= cursor {
+                available_for_print = cursor;
+            } else {
+                available_for_print = 8 - source_lhs_shift;
+            }
 
             let write_size;
             
@@ -252,7 +256,7 @@ pub fn bit_write<T, S>(
                 // We will record the `available` number of bits, track it
                 write_size = available_for_print;
                 // Also let's change the `fullness` by the amount available
-                fullness += available_for_print;
+                target_fullness += available_for_print;
                 
                 // For example:
                 //
@@ -285,7 +289,7 @@ pub fn bit_write<T, S>(
             } else {
                 // We will record the `slots_in_target_byte` number of bits, track it
                 write_size = slots_in_target_byte;
-                fullness = 8;
+                target_fullness = 8;
 
                 // For example:
                 //   
@@ -334,8 +338,8 @@ pub fn bit_write<T, S>(
             // We have completely filled the byte in TARGET, 
             // there is nowhere else to write, we move on 
             // to the next byte in TARGET
-            if fullness == 8 {
-                fullness = 0;
+            if target_fullness == 8 {
+                target_fullness = 0;
                 break;
             }
         }
@@ -399,7 +403,7 @@ mod tests_bit_write {
 
         let b_source = source.to_be_bytes();
         
-        let source_bit_offset = b_source.len()*6 +2;
+        let source_bit_offset = 6*8 +2;
         bit_write(
             &mut target,
              3, 
