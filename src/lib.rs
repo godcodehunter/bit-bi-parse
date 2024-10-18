@@ -390,7 +390,7 @@ mod tests_bit_write {
     }
 
     #[test]
-    fn heck_custom_offset() {
+    fn heck_custom_offset_small() {
         let mut target = [0u8; 2];
         let source = u64::from_be_bytes([
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -408,11 +408,39 @@ mod tests_bit_write {
              source_bit_offset,
         );
 
+        // TODO: remove
         for &num in target.iter() {
             println!("{:08b}", num); 
         }
 
         assert_eq!(target, [0b00011100, 0b00000000]);
+    }
+
+    #[test]
+    fn heck_custom_offset_intersection() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b11111111, 0b11100000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000000,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        
+        let source_bit_offset = 16;
+        bit_write(
+            &mut target, 
+            4, 
+            11, 
+            &b_source, 
+            source_bit_offset,
+        );
+
+        // TODO: remove
+        for &num in target.iter() {
+            println!("{:08b}", num); 
+        }
+        
+        assert_eq!(target, [0b00001111, 0b11111110]);
     }
 }
 
