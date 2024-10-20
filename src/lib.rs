@@ -360,7 +360,7 @@ mod tests_bit_write {
     use super::*;
 
     #[test]
-    fn heck_intersection() {
+    fn сheck_intersection() {
         let mut target = [0u8; 2];
         let source = u64::from_be_bytes([
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -373,7 +373,7 @@ mod tests_bit_write {
     }
 
     #[test]
-    fn heck_small() {
+    fn сheck_small() {
         let mut target = [0u8; 2];
         let source = u64::from_be_bytes([
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -539,5 +539,273 @@ mod tests_bit_clean {
         let expected = [0b00000000, 0b00000000, 0b11111111, 0b00000000];
         
         assert_eq!(expected, target)
+    }
+}
+
+/// Writes `recordable_bit_size` bits by offset `source_bit_offset` from source 
+/// to target by bit offset `target_bit_offset`
+/// 
+/// **PANIC**: If out of range target or source
+/// 
+/// **NOTE**: It is assumed that the target is prepared for writing, i.e., 
+/// for example, no cleaning is applied
+pub fn membitcpy<T, S>(
+    target: &mut T,
+    target_bit_offset: usize,
+    recordable_bit_size: usize,
+    source: &S,
+    source_bit_offset: usize,
+) where
+    T: IndexMut<usize, Output = u8>,
+    S: Index<usize, Output = u8>,
+{
+    if recordable_bit_size == 0 {
+        return;
+    }
+
+    // The index of the first byte of bytes to which 
+    // the recording will be performed
+    let start_byte_index = target_bit_offset / 8;
+
+    // If we imagine that `bit_offset` is 3, then 
+    // there are 5 slots (bits in which we write)
+    //              |
+    //              |
+    //              ----------
+    //  ... # |1|0|1|0|0|0|0|0| # |0|0|0|0|0|0|0|0| # ...
+    //       \_________________/ \_________________/  
+    //               |                   \
+    //   first partially affected byte   next affected byte
+    //
+    let slots_at_start_byte = 8 - target_bit_offset % 8;
+
+    // The number of bytes to which the recording will be performed
+    //     |
+    //     \-----------
+    // |b|b|pa|a|a|a|pa|b|b|
+    //
+    // NOTE: Minimum 1, since `bit_size` > 0
+    let mut affected_bytes_num = 1;
+
+    // NOTE: we use here saturating subtraction, because
+    // we have a situation where there are enough 
+    // slots in the first partially affected byte for recording
+    let remainder = recordable_bit_size.saturating_sub(slots_at_start_byte);
+    
+    // Check the situation described in the note above 
+    if remainder != 0 {
+        // Add affected byte
+        affected_bytes_num += remainder / 8;
+
+        // If exist remainder, add last partially affected byte
+        if remainder % 8 > 0 {
+            affected_bytes_num += 1;
+        }
+    }
+
+    // Counter of the number of slots already occupied 
+    // in the current byte. Here we initialize for
+    // first partially affected byte
+    //
+    //        for ex 3 occupied slots, so `fullness` == 3
+    // ------/
+    // |1|1|1|0|0|0|0|0| 
+    //
+    let mut target_fullness = target_bit_offset % 8;
+    
+    // A counter that counts the number bits remaining for recording.
+    let mut cursor = recordable_bit_size;
+    
+    // Iterate affected bytes
+    //
+    // |b|b|pa|a|a|a|pa|b|b|
+    //      ^  ^ ^ ^ ^
+    //      --------->
+    let last_byte_index = start_byte_index + affected_bytes_num;
+    let iter_range = start_byte_index..last_byte_index;
+    for target_index in iter_range {
+        // Target:
+        // 
+        // |1|1|1|0|0|0|0|0|
+        // ------ ----------
+        // \               \
+        //  fullnes        slots_in_target_byte
+        //
+        // Source
+        //
+        // |1|1|1|1|1|1|1|1|
+        // ------ ---------
+        // \               \     
+        //  \              available_for_print         
+        //   \
+        // source_lhs_shift
+        //
+        loop {
+       
+            // Number of bits already written
+            let already_written = recordable_bit_size - cursor;
+
+            // Calculate index of first byte being written
+            let source_index = (source_bit_offset + already_written) / 8;
+
+
+            // The available number of slots to which we will write 
+            // in the current byte in the TARGET
+            let slots_in_target_byte = if target_fullness != 0 { 8 - target_fullness } else { 8 };
+            
+            let source_lhs_shift = (source_bit_offset + already_written) % 8;
+
+            // Available for printing bit slots from SOURCE!
+            let available_for_print;
+            if 8 - source_lhs_shift >= cursor {
+                available_for_print = cursor;
+            } else {
+                available_for_print = 8 - source_lhs_shift;
+            }
+
+            let write_size;
+            
+            // Mask that zeroes out bits that are insignificant for recording
+            let rem = 8 - (source_lhs_shift + available_for_print);
+            let ahead_mask = 0b11111111u8.checked_shl((available_for_print + rem) as u32).unwrap_or_default();
+            let afterward_mask = 0b11111111u8.checked_shr((source_lhs_shift + available_for_print) as u32).unwrap_or_default();
+            let mut mask = 0u8;
+            mask |= ahead_mask;
+            mask |= afterward_mask;
+            mask = !mask;
+            
+            if target_fullness < source_lhs_shift {
+                let shift = source_lhs_shift - target_fullness;
+                target[target_index] |= (mask & source[source_index]) << shift;   
+            } else if target_fullness > source_lhs_shift {
+                let shift = target_fullness - source_lhs_shift;
+                target[target_index] |= (mask & source[source_index]) >> shift;   
+            } else {
+                target[target_index] |= mask & source[source_index];
+            }
+
+            // We handle the situation when there are more slots in TARGET than 
+            // slots in SOURCE.
+            if slots_in_target_byte >= available_for_print {     
+                // We will record the `available` number of bits, track it
+                write_size = available_for_print;
+                // Also let's change the `fullness` by the amount available
+                target_fullness += available_for_print;
+                 
+            // There are not enough slots in the TARGET byte, 
+            // we can only write part of the SOURCE
+            } else {
+                // We will record the `slots_in_target_byte` number of bits, track it
+                write_size = slots_in_target_byte;
+                target_fullness = 8;
+            }
+
+            // Reduce by the amount of written
+            cursor -= write_size;
+
+            // We have written all the bits, we are finishing the procedure
+            if cursor == 0 {
+                return;
+            }
+
+            // We have completely filled the byte in TARGET, 
+            // there is nowhere else to write, we move on 
+            // to the next byte in TARGET
+            if target_fullness == 8 {
+                target_fullness = 0;
+                break;
+            }
+        }
+    }
+}
+
+mod tests_membitcpy {
+    use super::*;
+
+    #[test]
+    fn check_intersection() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000100, 0b11111011,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        
+        let recordable_bit_size = 11;
+        let source_bit_offset = b_source.len()*8 - recordable_bit_size;
+        membitcpy(
+            &mut target, 
+            4, 
+            recordable_bit_size, 
+            &b_source, 
+            source_bit_offset,
+        );
+        assert_eq!(target, [0b00001001, 0b11110110]);
+    }
+
+    #[test]
+    fn heck_small() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000111,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        
+        let recordable_bit_size = 3;
+        let source_bit_offset = b_source.len()*8 - recordable_bit_size;
+        membitcpy(
+            &mut target,
+             3, 
+             recordable_bit_size, 
+             &b_source, 
+             source_bit_offset,
+        );
+        assert_eq!(target, [0b00011100, 0b00000000]);
+    }
+
+    #[test]
+    fn heck_custom_offset_small() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00111000, 0b00000000,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        
+        let source_bit_offset = 6*8 +2;
+        membitcpy(
+            &mut target,
+             3, 
+             3, 
+             &b_source, 
+             source_bit_offset,
+        );
+        assert_eq!(target, [0b00011100, 0b00000000]);
+    }
+
+    #[test]
+    fn check_custom_offset_intersection() {
+        let mut target = [0u8; 2];
+        let source = u64::from_be_bytes([
+            0b00000000, 0b00000000, 0b10011111, 0b11100000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000000,
+        ]);
+
+        let b_source = source.to_be_bytes();
+        
+        let source_bit_offset = 16;
+        membitcpy(
+            &mut target, 
+            4, 
+            11, 
+            &b_source, 
+            source_bit_offset,
+        );
+    
+        assert_eq!(target, [0b00001001, 0b11111110]);
     }
 }
