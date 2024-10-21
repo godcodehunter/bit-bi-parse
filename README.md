@@ -170,7 +170,7 @@ Example simple parser:
 
 Interesting `membitcpy` function. This function uses offset for the source as well. In essence, this function is a lens, since only with its help can both a parser and a printer be implemented simultaneously:
 
-```
+```rust
 // lets parse something
 
 let mut target = [0u8; 2];
