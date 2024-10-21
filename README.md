@@ -168,6 +168,49 @@ Example simple parser:
 
 ```  -->
 
+Interesting `membitcpy` function. This function uses offset for the source as well. In essence, this function is a lens, since only with its help can both a parser and a printer be implemented simultaneously:
+
+```
+// lets parse something
+
+let mut target = [0u8; 2];
+let source = u64::from_be_bytes([
+	0b00000000, 0b00000000, 0b10011111, 0b11100000, 0b00000000, 
+	0b00000000, 0b00000000, 0b00000000,
+]);
+
+let b_source = source.to_be_bytes();
+
+let source_bit_offset = 16;
+membitcpy(
+	&mut target, 
+	4, 
+	11, 
+	&b_source, 
+	source_bit_offset,
+);
+
+assert_eq!(target, [0b00001001, 0b11111110]);
+
+// now lets print what we parse
+
+let mut new_target = [0u8; 8];
+
+membitcpy(
+	&mut new_target,
+	8*2,
+	11,
+	&target,
+	4,
+);
+
+// here we can see that our new target equivalent 
+// our primary source 
+
+assert_eq!(new_target, b_source);
+
+```
+
 Similar libraries:
 
 - https://lib.rs/crates/nom
