@@ -168,7 +168,7 @@ Example simple parser:
 
 ```  -->
 
-Interesting `membitcpy` function. This function uses offset for the source as well. In essence, this function is a lens, since only with its help can both a parser and a printer be implemented simultaneously:
+Interesting `membitcpy` function. This function uses offset for the source as well. In essence, this function can be view as [bidirectional lens](https://www.youtube.com/watch?v=qKnZk27E9Uc), since only with it can both a parser and a printer be implemented:
 
 ```rust
 // lets parse something
