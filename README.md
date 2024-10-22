@@ -6,10 +6,15 @@ Example simple printer:
 
 ```rust
 	struct Sample {
+		// offset: 0,   bis_size: 6
 		field1: u64,
+		// offset: 6,   bis_size: 32
 		field2: u64,
+		// offset: 48,  bis_size: 4
 		field3: u64,
+		// offset: 52,  bis_size: 64
 		field4: u64,
+		// offset: 116, bis_size: 6
 		field5: u64,
 	}
 
@@ -130,10 +135,15 @@ Example simple parser:
 
 ```rust
 	struct Sample {
+		// offset: 0,   bis_size: 6
 		field1: u64,
+		// offset: 6,   bis_size: 32
 		field2: u64,
+		// offset: 48,  bis_size: 4
 		field3: u64,
+		// offset: 52,  bis_size: 64
 		field4: u64,
+		// offset: 116, bis_size: 6
 		field5: u64,
 	}
 
