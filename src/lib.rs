@@ -831,6 +831,7 @@ pub fn bit_read<T, S>(
             if already_written > 0 {
                 source_index += already_written / 8;
 
+                // TODO: error
                 if already_written % 8 > 0 {
                     source_index += 1;
                 }
