@@ -360,7 +360,7 @@ mod tests_bit_write {
     use super::*;
 
     #[test]
-    fn сheck_intersection() {
+    fn check_intersection() {
         let mut target = [0u8; 2];
         let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -372,7 +372,7 @@ mod tests_bit_write {
     }
 
     #[test]
-    fn сheck_small() {
+    fn check_small() {
         let mut target = [0u8; 2];
         let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
@@ -869,7 +869,7 @@ pub fn bit_read<T, S>(
                 fullnes += available_for_print;
 
                 let shift = slots_in_target_byte - available_for_print;
-                target[target_index] |= (mask & source[source_index]) >> shift;
+                target[target_index] |= (mask & source[source_index]) << shift;
             } else {
                 cursor -= slots_in_target_byte;
                 fullnes += slots_in_target_byte;
@@ -894,7 +894,20 @@ mod tests_bit_read {
     use super::*;
 
     #[test]
-    fn сheck_intersection1() {
+    fn check_small() {
+        let source = [
+            0b00000000, 0b00000000, 0b00000011, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000000,
+        ];
+        let mut target = [0u8; 2];
+        let target_len = target.len();
+
+        bit_read(&source, 22, 2, &mut target, target_len);
+        assert_eq!(target, [0b00000000, 0b00000011]);
+    }
+
+    #[test]
+    fn check_intersection1() {
         let source = [
             0b00000000, 0b00000111, 0b11111111, 0b00000000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000000,
@@ -907,7 +920,7 @@ mod tests_bit_read {
     }
     
     #[test]
-    fn сheck_intersection2() {
+    fn check_intersection2() {
         let source = [
             0b00000000, 0b00000000, 0b11111111, 0b11100000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000000,
@@ -920,15 +933,15 @@ mod tests_bit_read {
     }
 
     #[test]
-    fn сheck_intersection3() {
+    fn check_intersection3() {
         let source = [
-            0b00000000, 0b00000111, 0b11111111, 0b11100000, 0b00000000, 
+            0b00000000, 0b00000100, 0b10111001, 0b10100000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000000,
         ];
         let mut target = [0u8; 2];
         let target_len = target.len();
 
         bit_read(&source, 8 + 5, 14, &mut target, target_len);
-        assert_eq!(target, [0b00111111, 0b11111111]);
+        assert_eq!(target, [0b00100101, 0b11001101]);
     }
 }
