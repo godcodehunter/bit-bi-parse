@@ -819,7 +819,67 @@ pub fn bit_read<T, S>(
         "recordable_bit_size large than target bit size"
     );
     
-    todo!()
+    let mut cursor = recordable_bit_size;
+        
+    let start_byte_index = (byte_target_len * 8 - recordable_bit_size) / 8;
+    let last_byte_index = byte_target_len;
+    let iter_range = start_byte_index..last_byte_index;
+    for target_index in iter_range {
+        loop {
+            let mut source_index = source_bit_offset / 8;
+            let already_written = recordable_bit_size - cursor;
+            source_index += already_written / 8;
+
+            // Source
+            //
+            // |1|1|1|1|1|1|1|1|
+            // ------ ---------
+            // \               \     
+            //  \              available_for_print         
+            //   \
+            // source_lhs_shift
+            //
+            let source_lhs_shift = (source_bit_offset + already_written) % 8;
+            let available_for_print = 8 - source_lhs_shift;
+
+            // Target:
+            // 
+            // |1|1|1|0|0|0|0|0|
+            // ------ ----------
+            // \               \
+            //  fullnes        slots_in_target_byte
+            //
+
+            // TODO: broken
+            let slots_in_target_byte = (recordable_bit_size - already_written) % 8;
+            let mut fullnes = 8 - slots_in_target_byte;
+
+            // let mask = !0b11111111u8.checked_shl(available_for_print as u32).unwrap_or_default();
+
+            // if slots_in_target_byte >= available_for_print {
+            //     cursor -= available_for_print;
+            //     fullnes += available_for_print;
+
+            //     let shift = slots_in_target_byte - available_for_print;
+            //     target[target_index] |= (mask & source[source_index]) >> shift;
+            // } else {
+            //     cursor -= slots_in_target_byte;
+            //     fullnes += available_for_print;
+
+            //     let shift = available_for_print - slots_in_target_byte;
+            //     target[target_index] |= (mask & source[source_index]) >> shift;
+            // }
+            
+
+            // if cursor == 0 {
+            //     return;
+            // }
+
+            // if fullnes == 8 {
+            //     break;
+            // }        
+        }
+    }
 }
 
 mod tests_bit_read {
