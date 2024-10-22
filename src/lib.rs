@@ -862,7 +862,7 @@ pub fn bit_read<T, S>(
             }
             let mut fullnes = 8 - slots_in_target_byte;
 
-            let mask = !0b11111111u8.checked_shl(available_for_print as u32).unwrap_or_default();
+            let mask = 0b11111111u8 >> source_lhs_shift;
 
             if slots_in_target_byte >= available_for_print {
                 cursor -= available_for_print;
@@ -872,7 +872,7 @@ pub fn bit_read<T, S>(
                 target[target_index] |= (mask & source[source_index]) >> shift;
             } else {
                 cursor -= slots_in_target_byte;
-                fullnes += available_for_print;
+                fullnes += slots_in_target_byte;
 
                 let shift = available_for_print - slots_in_target_byte;
                 target[target_index] |= (mask & source[source_index]) >> shift;
@@ -905,7 +905,7 @@ mod tests_bit_read {
         bit_read(&source, 8 + 5, 11, &mut target, target_len);
         assert_eq!(target, [0b00000111, 0b11111111]);
     }
-
+    
     #[test]
     fn сheck_intersection2() {
         let source = [
@@ -917,5 +917,18 @@ mod tests_bit_read {
 
         bit_read(&source, 16, 11, &mut target, target_len);
         assert_eq!(target, [0b00000111, 0b11111111]);
+    }
+
+    #[test]
+    fn сheck_intersection3() {
+        let source = [
+            0b00000000, 0b00000111, 0b11111111, 0b11100000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000000,
+        ];
+        let mut target = [0u8; 2];
+        let target_len = target.len();
+
+        bit_read(&source, 8 + 5, 14, &mut target, target_len);
+        assert_eq!(target, [0b00111111, 0b11111111]);
     }
 }
