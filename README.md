@@ -128,7 +128,7 @@ Example simple printer:
 
 Example simple parser:
 
-<!-- ```rust
+```rust
 	struct Sample {
 		field1: u64,
 		field2: u64,
@@ -141,32 +141,48 @@ Example simple parser:
 		type Error = ();
 
 		fn try_from(bytes: [u8; 14]) -> Result<Self, Self::Error> {
-			// TODO: ...
-			bit_read(&bytes, offset, 6, &mut bytes, b_field1_len);
+			let mut offset = 0;
+
+			let mut field1 = [0u8; 8];
+			let b_field1_len = field1.len();
+
+			let mut field2 = [0u8; 8];
+			let b_field2_len = field2.len();
+			
+			let mut field3 = [0u8; 8];
+			let b_field3_len = field3.len();
+			
+			let mut field4 = [0u8; 8];
+			let b_field4_len = field4.len();
+			
+			let mut field5 = [0u8; 8];
+			let b_field5_len = field5.len();
+
+			bit_read(&bytes, offset, 6, &mut field1, field1_len);
 			offset += 6;
 
-			bit_read(&bytes, offset, 32, &mut target.field2, b_field2_len);
+			bit_read(&bytes, offset, 32, &mut field2, b_field2_len);
 			offset += 32;
 
-			bit_read(&bytes, offset, 4, &mut target.field3, b_field3_len);
+			bit_read(&bytes, offset, 4, &mut field3, b_field3_len);
 			offset += 4;
 
-			bit_read(&bytes, offset, 64, &mut target.field4, b_field4_len);
+			bit_read(&bytes, offset, 64, &mut field4, b_field4_len);
 			offset += 64;
 
-			bit_read(&bytes, offset, 6, &mut target.field5, b_field5_len);
+			bit_read(&bytes, offset, 6, &mut field5, b_field5_len);
 
 			Ok(Sample {
-				field1: todo(),
-				field2: todo(),
-				field3: todo(),
-				field4: todo(),
-				field5: todo(),
+				field1: u64::from_be_bytes(field1),
+				field2: u64::from_be_bytes(field2),
+				field3: u64::from_be_bytes(field3),
+				field4: u64::from_be_bytes(field4),
+				field5: u64::from_be_bytes(field5),
 			})
 		}
 	}
 
-```  -->
+``` 
 
 Interesting `membitcpy` function. This function uses offset for the source as well. In essence, this function can be view as [bidirectional lens](https://www.youtube.com/watch?v=qKnZk27E9Uc), since only with it can both a parser and a printer be implemented:
 
