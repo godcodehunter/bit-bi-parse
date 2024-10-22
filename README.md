@@ -10,11 +10,11 @@ Example simple printer:
 		field1: u64,
 		// offset: 6,   bis_size: 32
 		field2: u64,
-		// offset: 48,  bis_size: 4
+		// offset: 38,  bis_size: 4
 		field3: u64,
-		// offset: 52,  bis_size: 64
+		// offset: 42,  bis_size: 64
 		field4: u64,
-		// offset: 116, bis_size: 6
+		// offset: 108, bis_size: 6
 		field5: u64,
 	}
 
@@ -139,14 +139,14 @@ Example simple parser:
 		field1: u64,
 		// offset: 6,   bis_size: 32
 		field2: u64,
-		// offset: 48,  bis_size: 4
+		// offset: 38,  bis_size: 4
 		field3: u64,
-		// offset: 52,  bis_size: 64
+		// offset: 42,  bis_size: 64
 		field4: u64,
-		// offset: 116, bis_size: 6
+		// offset: 108, bis_size: 6
 		field5: u64,
 	}
-
+	
 	impl TryFrom<[u8; 14]> for Sample {
 		type Error = ();
 
