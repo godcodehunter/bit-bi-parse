@@ -1,4 +1,6 @@
-Very simple library for binary printer/parser.
+# Bit-bi-parse
+
+Very simple library for binary printer/parser (encoding/decoding). That is, this library allows you to write/read, by offset, individual bit sequences. 
 
 ![alt text](./doc/asserts/principle.png)
 
@@ -146,7 +148,7 @@ Example simple parser:
 		// offset: 108, bis_size: 6
 		field5: u64,
 	}
-	
+
 	impl TryFrom<[u8; 14]> for Sample {
 		type Error = ();
 
