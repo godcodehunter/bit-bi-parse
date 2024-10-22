@@ -362,26 +362,24 @@ mod tests_bit_write {
     #[test]
     fn сheck_intersection() {
         let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
+        let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
             0b00000000, 0b00000111, 0b11111111,
-        ]);
+        ];
 
-        let b_source = source.to_be_bytes();
-        bit_write(&mut target, 4, 11, &b_source, b_source.len());
+        bit_write(&mut target, 4, 11, &source, source.len());
         assert_eq!(target, [0b00001111, 0b11111110]);
     }
 
     #[test]
     fn сheck_small() {
         let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
+        let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000111,
-        ]);
+        ];
 
-        let b_source = source.to_be_bytes();
-        bit_write(&mut target, 3, 3, &b_source, b_source.len());
+        bit_write(&mut target, 3, 3, &source, source.len());
         assert_eq!(target, [0b00011100, 0b00000000]);
     }
 }
