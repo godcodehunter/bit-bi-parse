@@ -826,17 +826,9 @@ pub fn bit_read<T, S>(
     let iter_range = start_byte_index..last_byte_index;
     for target_index in iter_range {
         loop {
-            let mut source_index = source_bit_offset / 8;
             let already_written = recordable_bit_size - cursor;
-            if already_written > 0 {
-                source_index += already_written / 8;
-
-                // TODO: error
-                if already_written % 8 > 0 {
-                    source_index += 1;
-                }
-            }
-
+            let source_index = (source_bit_offset + already_written) / 8;
+           
             // Source
             //
             // |1|1|1|1|1|1|1|1|
