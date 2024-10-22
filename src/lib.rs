@@ -887,7 +887,7 @@ mod tests_bit_read {
     use super::*;
 
     #[test]
-    fn check_small() {
+    fn check_small1() {
         let source = [
             0b00000000, 0b00000000, 0b00000011, 0b00000000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000000,
@@ -897,6 +897,19 @@ mod tests_bit_read {
 
         bit_read(&source, 22, 2, &mut target, target_len);
         assert_eq!(target, [0b00000000, 0b00000011]);
+    }
+
+    #[test]
+    fn check_small2() {
+        let source = [
+            0b00000000, 0b00111000, 0b00000000, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000000,
+        ];
+        let mut target = [0u8; 2];
+        let target_len = target.len();
+
+        bit_read(&source, 10, 3, &mut target, target_len);
+        assert_eq!(target, [0b00000000, 0b00000111]);
     }
 
     #[test]
@@ -936,5 +949,18 @@ mod tests_bit_read {
 
         bit_read(&source, 8 + 5, 14, &mut target, target_len);
         assert_eq!(target, [0b00100101, 0b11001101]);
+    }
+
+    #[test]
+    fn check_long() {
+        let source = [
+            0b00000000, 0b00000000, 0b11111111, 0b11111111, 0b11111111, 
+            0b00000000, 0b00000000, 0b00000000,
+        ];
+        let mut target = [0u8; 3];
+        let target_len = target.len();
+
+        bit_read(&source, 8*2, 8*3, &mut target, target_len);
+        assert_eq!(target, [0b11111111, 0b11111111, 0b11111111]);
     }
 }
