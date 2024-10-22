@@ -725,20 +725,18 @@ mod tests_membitcpy {
     #[test]
     fn check_intersection() {
         let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
+        let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
             0b00000000, 0b00000100, 0b11111011,
-        ]);
-
-        let b_source = source.to_be_bytes();
+        ];
         
         let recordable_bit_size = 11;
-        let source_bit_offset = b_source.len()*8 - recordable_bit_size;
+        let source_bit_offset = source.len()*8 - recordable_bit_size;
         membitcpy(
             &mut target, 
             4, 
             recordable_bit_size, 
-            &b_source, 
+            &source, 
             source_bit_offset,
         );
         assert_eq!(target, [0b00001001, 0b11110110]);
@@ -747,20 +745,18 @@ mod tests_membitcpy {
     #[test]
     fn heck_small() {
         let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
+        let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000111,
-        ]);
-
-        let b_source = source.to_be_bytes();
+        ];
         
         let recordable_bit_size = 3;
-        let source_bit_offset = b_source.len()*8 - recordable_bit_size;
+        let source_bit_offset = source.len()*8 - recordable_bit_size;
         membitcpy(
             &mut target,
              3, 
              recordable_bit_size, 
-             &b_source, 
+             &source, 
              source_bit_offset,
         );
         assert_eq!(target, [0b00011100, 0b00000000]);
@@ -769,19 +765,17 @@ mod tests_membitcpy {
     #[test]
     fn heck_custom_offset_small() {
         let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
+        let source = [
             0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 
             0b00000000, 0b00111000, 0b00000000,
-        ]);
-
-        let b_source = source.to_be_bytes();
+        ];
         
         let source_bit_offset = 6*8 +2;
         membitcpy(
             &mut target,
              3, 
              3, 
-             &b_source, 
+             &source, 
              source_bit_offset,
         );
         assert_eq!(target, [0b00011100, 0b00000000]);
@@ -790,19 +784,17 @@ mod tests_membitcpy {
     #[test]
     fn check_custom_offset_intersection() {
         let mut target = [0u8; 2];
-        let source = u64::from_be_bytes([
+        let source = [
             0b00000000, 0b00000000, 0b10011111, 0b11100000, 0b00000000, 
             0b00000000, 0b00000000, 0b00000000,
-        ]);
-
-        let b_source = source.to_be_bytes();
-        
+        ];
+ 
         let source_bit_offset = 16;
         membitcpy(
             &mut target, 
             4, 
             11, 
-            &b_source, 
+            &source, 
             source_bit_offset,
         );
     
@@ -830,4 +822,21 @@ pub fn bit_read<T, S>(
     );
     
     todo!()
+}
+
+mod tests_bit_read {
+    use super::*;
+
+    #[test]
+    fn check() {
+        let source = [
+            0b00000000, 0b00000111, 0b11111111, 0b00000000, 0b00000000, 
+            0b00000000, 0b00000000, 0b00000000,
+        ];
+        let mut target = [0u8; 2];
+        let target_len = target.len();
+
+        bit_read(&source, 8 + 5, 11, &mut target, target_len);
+        assert_eq!(target, [0b00001111, 0b11111110]);
+    }
 }
