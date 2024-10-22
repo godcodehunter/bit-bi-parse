@@ -128,7 +128,7 @@ pub fn bit_write<T, S>(
 
     assert!(
         recordable_bit_size <= byte_source_len * 8,
-        "bit_size large than source bit size"
+        "recordable_bit_size large than source bit size"
     );
 
     // The index of the first byte of bytes to which 
@@ -808,4 +808,26 @@ mod tests_membitcpy {
     
         assert_eq!(target, [0b00001001, 0b11111110]);
     }
+}
+
+pub fn bit_read<T, S>(
+    source: &S,
+    source_bit_offset: usize,
+    recordable_bit_size: usize,
+    target: &mut T,
+    byte_target_len: usize,
+) where
+    T: IndexMut<usize, Output = u8>,
+    S: Index<usize, Output = u8>,
+{
+    if recordable_bit_size == 0 {
+        return;
+    }
+
+    assert!(
+        recordable_bit_size <= byte_target_len * 8,
+        "recordable_bit_size large than target bit size"
+    );
+    
+    todo!()
 }
